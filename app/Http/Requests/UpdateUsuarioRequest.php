@@ -12,7 +12,7 @@ class UpdateUsuarioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,8 +22,71 @@ class UpdateUsuarioRequest extends FormRequest
      */
     public function rules(): array
     {
+        $usuario = $this->route('usuario')->id;
+
         return [
-            //
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|email|max:255|unique:users,email,' . $usuario,
+            'password'         => 'nullable|string|min:8',
+            'dni'              => 'required|string|max:20|unique:users,dni,' . $usuario,
+            'fecha_nacimiento' => [
+                'required',
+                'date',
+                'before:today',
+                'after:' . now()->subYears(120)->format('Y-m-d'),
+                'before_or_equal:' . now()->subYears(12)->format('Y-m-d'),
+            ],
+            'telefono'         => 'nullable|string|max:15',
         ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required'             => 'El nombre es obligatorio.',
+            'email.required'            => 'El correo electrónico es obligatorio.',
+            'email.unique'              => 'Este correo ya está registrado.',
+            'password.required'         => 'La contraseña es obligatoria.',
+            'password.min'              => 'La contraseña debe tener al menos 8 caracteres.',
+            'dni.required'              => 'El DNI es obligatorio.',
+            'dni.unique'                => 'Este DNI ya pertenece a otro usuario.',
+            'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
+            'fecha_nacimiento.before'   => 'La fecha de nacimiento no puede ser futura.',
+            'fecha_nacimiento.before_or_equal' => 'El usuario debe tener al menos 12 años.',
+            'fecha_nacimiento.after'           => 'La fecha de nacimiento no es válida.',
+
+        ];
+    }
+
+    public function withValidator($validator)
+    {
+
+        $validator->after(function ($validator) {
+
+            // 1. VALIDAR LETRA DEL DNI
+            $this->validarDni($validator);
+        });
+    }
+
+
+
+    private function validarDni($validator)
+    {
+
+        $dni = $this->input('dni'); // ← Obtenemos el valor del campo
+
+        // Solo validamos si el DNI tiene el formato correcto (ya lo validó rules())
+        if (!preg_match('/^[0-9]{8}[A-Za-z]$/', $dni)) {
+            return; // Si no cumple el patrón, ya hay error de rules()
+        }
+
+        $numeroDni = substr($dni, 0, 8);
+        $letraDni = strtoupper(substr($dni, -1));
+        $letras = 'TRWAGMYFPDXBNJZSQVHLCKE';
+        $letraCorrecta = $letras[$numeroDni % 23];
+
+        if ($letraDni !== $letraCorrecta) {
+            $validator->errors()->add('dni', 'La letra tiene que ser válida en relación al número introducido.');
+        }
     }
 }

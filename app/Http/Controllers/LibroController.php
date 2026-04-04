@@ -35,7 +35,7 @@ class LibroController extends Controller
     {
         Libro::create($request->validated());
 
-        return redirect()->route('libros.index')->with('succes', 'Libro creado con éxito');
+        return redirect()->route('libros.index')->with('success', 'Libro creado con éxito');
     }
 
     /**

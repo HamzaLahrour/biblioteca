@@ -12,19 +12,11 @@ class Espacio extends Model
 {
 
     // Permite utilizar UUIDs de manera automatica
-    use HasUuids; 
+    use HasUuids;
 
-   //Tabla de base de datos que vamos a usar
-   protected $table = 'espacios';
-
-   //Marcamos como falso por que lleva uuid
-   public $incrementing = false; 
-   //String por que es una cadena el uuiid
-   protected $keyType = 'string';
-
-
-    public function reservas(){
-        return $this->hasMany(Reserva::class); 
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class);
     }
 
     public function tipoEspacio(): BelongsTo
@@ -39,11 +31,10 @@ class Espacio extends Model
         'ubicacion',
         'capacidad',
         'disponible',
-        'tipo_espacio_id', 
+        'tipo_espacio_id',
     ];
 
     protected $casts = [
         'disponible' => 'boolean',
     ];
-    
 }

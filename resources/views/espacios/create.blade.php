@@ -5,7 +5,7 @@
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        
+
         <div class="mb-3">
             <a href="{{ route('espacios.index') }}" class="text-decoration-none" style="color: var(--text-muted); font-weight: 500;">
                 <i class="bi bi-arrow-left me-1"></i> Volver al listado
@@ -21,94 +21,94 @@
                     Añade un espacio de trabajo, sala o puesto individual al catálogo de instalaciones.
                 </p>
             </div>
-            
+
             <div class="card-body p-4">
                 <form action="{{ route('espacios.store') }}" method="POST">
                     @csrf
-                    
+
                     <div class="mb-4">
                         <label for="nombre" class="form-label" style="font-weight: 600; color: var(--text-main);">Nombre del espacio <span class="text-danger">*</span></label>
-                        <input type="text" 
-                               name="nombre" 
-                               id="nombre" 
-                               class="form-control form-control-lg @error('nombre') is-invalid @enderror" 
-                               value="{{ old('nombre') }}" 
-                               placeholder="Ej: Mesa 4, Sala de Reuniones B, Puesto Informático 12..."
-                               style="font-size: 1rem; border-color: #e0e0e0;">
+                        <input type="text"
+                            name="nombre"
+                            id="nombre"
+                            class="form-control form-control-lg @error('nombre') is-invalid @enderror"
+                            value="{{ old('nombre') }}"
+                            placeholder="Ej: Mesa 4, Sala de Reuniones B, Puesto Informático 12..."
+                            style="font-size: 1rem; border-color: #e0e0e0;">
                         @error('nombre')
-                            <div class="invalid-feedback fw-medium">{{ $message }}</div>
+                        <div class="invalid-feedback fw-medium">{{ $message }}</div>
                         @enderror
                     </div>
 
+
                     <div class="mb-4">
                         <label for="codigo" class="form-label" style="font-weight: 600; color: var(--text-main);">Codigo del espacio <span class="text-danger">*</span></label>
-                        <input type="text" 
-                               name="codigo" 
-                               id="codigo" 
-                               class="form-control form-control-lg @error('codigo') is-invalid @enderror" 
-                               value="{{ old('codigo') }}" 
-                               placeholder="Ej: TP-01"
-                               style="font-size: 1rem; border-color: #e0e0e0;">
+                        <input type="text"
+                            name="codigo"
+                            id="codigo"
+                            class="form-control form-control-lg @error('codigo') is-invalid @enderror"
+                            value="{{ old('codigo') }}"
+                            placeholder="Ej: TP-01"
+                            style="font-size: 1rem; border-color: #e0e0e0;">
                         @error('codigo')
-                            <div class="invalid-feedback fw-medium">{{ $message }}</div>
+                        <div class="invalid-feedback fw-medium">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-4">
                         <label for="ubicacion" class="form-label" style="font-weight: 600; color: var(--text-main);">Ubicación<span class="text-danger">*</span></label>
-                        <input type="text" 
-                               name="ubicacion" 
-                               id="ubicacion" 
-                               class="form-control form-control-lg @error('ubicacion') is-invalid @enderror" 
-                               value="{{ old('ubicacion') }}" 
-                               placeholder="Introduce la ubicación del espacio (Ej: Sala de estudio 2)"
-                               style="font-size: 1rem; border-color: #e0e0e0;">
+                        <input type="text"
+                            name="ubicacion"
+                            id="ubicacion"
+                            class="form-control form-control-lg @error('ubicacion') is-invalid @enderror"
+                            value="{{ old('ubicacion') }}"
+                            placeholder="Introduce la ubicación del espacio (Ej: Sala de estudio 2)"
+                            style="font-size: 1rem; border-color: #e0e0e0;">
                         @error('ubicacion')
-                            <div class="invalid-feedback fw-medium">{{ $message }}</div>
+                        <div class="invalid-feedback fw-medium">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-4">
                         <label for="capacidad" class="form-label" style="font-weight: 600; color: var(--text-main);">Capacidad<span class="text-danger">*</span></label>
-                        <input type="number" 
-                               name="capacidad" 
-                               id="capacidad" 
-                               class="form-control form-control-lg @error('capacidad') is-invalid @enderror" 
-                               value="{{ old('capacidad') }}" 
-                               placeholder="Introduce la capacidad (Ej: 15 personas)"
-                               style="font-size: 1rem; border-color: #e0e0e0;">
+                        <input type="number"
+                            name="capacidad"
+                            id="capacidad"
+                            class="form-control form-control-lg @error('capacidad') is-invalid @enderror"
+                            value="{{ old('capacidad') }}"
+                            placeholder="Introduce la capacidad (Ej: 15 personas)"
+                            style="font-size: 1rem; border-color: #e0e0e0;">
                         @error('capacidad')
-                            <div class="invalid-feedback fw-medium">{{ $message }}</div>
+                        <div class="invalid-feedback fw-medium">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <x-form.select 
-                        name="tipo_espacio_id" 
-                        label="Clasificación del Espacio" 
-                        :options="$tipos" 
-                    />
-                    
-                    
+                    <x-form.select
+                        name="tipo_espacio_id"
+                        label="Clasificación del Espacio"
+                        :options="$tipos" />
+
+
 
                     <div class="form-check form-switch mb-4">
                         <input type="hidden" name="disponible" value="0">
-                        <input class="form-check-input @error('disponible') is-invalid @enderror" 
-                            type="checkbox" 
-                            role="switch" 
-                            name="disponible" 
-                            id="disponible" 
-                            value="1" 
-                            {{ old('disponible', true) ? 'checked' : '' }} 
+                        <input class="form-check-input @error('disponible') is-invalid @enderror"
+                            type="checkbox"
+                            role="switch"
+                            name="disponible"
+                            id="disponible"
+                            value="1"
+                            {{ old('disponible', true) ? 'checked' : '' }}
                             style="transform: scale(1.2); margin-left: -2em;">
-                            <label class="form-check-label ms-2" for="disponible" style="font-weight: 600; color: var(--text-main);">
+                        <label class="form-check-label ms-2" for="disponible" style="font-weight: 600; color: var(--text-main);">
                             Disponible para reservas
-                            </label>
-                            <div class="form-text text-muted" style="font-size: 0.85rem;">Si lo desmarcas, este espacio estará en mantenimiento.</div>
+                        </label>
+                        <div class="form-text text-muted" style="font-size: 0.85rem;">Si lo desmarcas, este espacio estará en mantenimiento.</div>
                     </div>
 
 
 
-                
+
 
 
 

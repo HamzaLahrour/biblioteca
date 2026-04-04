@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('sanciones', function (Blueprint $table) {
             $table->uuid('id')->primary();
-        
+
             // Corregido a foreignId y user_id para que coincida con la tabla users
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-        
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
+
             $table->text('razon');
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
-        
+
             // (Opcional) Si quieres que el admin pueda perdonar la sanción antes de tiempo
             $table->date('fecha_levantamiento_manual')->nullable();
-        
+
             $table->timestamps();
         });
     }
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sancions');
+        Schema::dropIfExists('sanciones');
     }
 };

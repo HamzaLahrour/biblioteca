@@ -4,87 +4,112 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUsuarioRequest;
-use Illuminate\Support\Facades\Auth; 
-
+use App\Http\Requests\UpdateUsuarioRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $usuarios = User::orderBy('name')->paginate(10);
+        return view('usuarios.index', compact('usuarios'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('usuarios.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreUsuarioRequest $request)
     {
-        //
+
+        $datos = $request->validated();
+
+        $datos['rol'] = 'usuario';
+
+        User::create($datos);
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado con éxito');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(User $usuario)
     {
-        //
+        $usuario->load('prestamos', 'reservas', 'sanciones');
+        return view('usuarios.show', compact('usuario'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(User $usuario)
     {
-        //
+
+        return view('usuarios.edit', compact('usuario'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(UpdateUsuarioRequest $request, User $usuario)
     {
-        //
+
+        $datos = $request->validated();
+
+        if (empty($datos['password'])) {
+            unset($datos['password']);
+        }
+
+        $usuario->fill($datos);
+
+        if (!$usuario->isDirty()) {
+            return redirect()->route('usuarios.index')
+                ->with('info', 'No realizaste ningún cambio.');
+        }
+
+        $usuario->save();
+
+        return redirect()->route('usuarios.index')
+            ->with('success', 'El usuario ha sido actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(User $usuario)
     {
-        //
+
+
+
+
+        if ($usuario->reservas()->count() > 0 || $usuario->prestamos()->count() > 0 || $usuario->sanciones()->count() > 0) {
+            return redirect()->route('usuarios.index')
+                ->with('error', 'No puedes borrar un usuario que contenga reservas, préstamos o sanciones activas.');
+        }
+
+        $usuario->delete();
+
+        return redirect()->route('usuarios.index')
+            ->with('success', 'El usuario ha sido eliminado con éxito.');
     }
 
-    
-    
+    //MÉTODOS DE AUTENTICACIÓN
+
     public function login()
     {
-        if(Auth::check()){
+        if (Auth::check()) {
             return redirect()->route('categorias.index');
         }
         return view('usuarios.login');
     }
 
-    public function authenticate(StoreUsuarioRequest $request)
+    public function authenticate(Request $request)
     {
-        if(Auth::attempt($request->only('email', 'password'))){
+
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->route('categorias.index');
         }
 
         return back()->withErrors([
             'email' => 'El email o la contraseña son incorrectos.'
-        ]);
+        ])->onlyInput('email');
     }
 
     public function logout(Request $request)
@@ -92,6 +117,7 @@ class UserController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('usuarios.login');
     }
 }

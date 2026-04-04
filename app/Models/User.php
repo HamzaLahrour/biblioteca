@@ -7,6 +7,13 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+
+
+
 
 class User extends Authenticatable
 {
@@ -18,6 +25,9 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+    use HasUuids;
+
 
     protected $fillable = [
         'name',
@@ -56,7 +66,7 @@ class User extends Authenticatable
     protected function edad(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->fecha_nacimiento ? $this->fecha_nacimiento->age : null,
+            get: fn() => $this->fecha_nacimiento ? $this->fecha_nacimiento->age : null,
         );
     }
 

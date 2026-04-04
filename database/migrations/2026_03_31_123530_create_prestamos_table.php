@@ -9,19 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('prestamos', function (Blueprint $table) {
             $table->uuid('id')->primary();
-        
+
             // Relaciones
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignUuid('libro_id')->constrained('libros')->onDelete('cascade');
-        
+
             // Control de fechas
             $table->date('fecha_prestamo');
             $table->date('fecha_devolucion_prevista');
             $table->date('fecha_devolucion_real')->nullable();
-        
+
             // Estado: activo, devuelto, retrasado...
             $table->string('estado')->default('activo');
             $table->timestamps();
