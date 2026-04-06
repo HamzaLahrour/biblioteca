@@ -128,13 +128,8 @@
 
                         <h6 class="sidebar-heading">B. Usuarios</h6>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="bi bi-people"></i> Listado de Usuarios
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="{{ route('usuarios.index') }}" class="nav-link">
-                                <i class="bi bi-person-plus"></i> Alta Manual
+                                <i class="bi bi-person-plus"></i> Gestion de Usuarios
                             </a>
                         </li>
 
@@ -173,6 +168,14 @@
                                 <i class="bi bi-bar-chart-line"></i> Informes de Uso
                             </a>
                         </li>
+
+                        <h6 class="sidebar-heading">F. Ajustes</h6>
+                        <li class="nav-item">
+                            <a href="{{ route('configuracion.edit') }}" class="nav-link {{ request()->routeIs('configuracion.*') ? 'active bg-primary-subtle text-primary fw-bold rounded' : '' }}">
+                                <i class="bi bi-gear-fill me-2"></i> Configuración General
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
             </nav>

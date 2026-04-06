@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\LibroController;
 use App\Http\Controllers\EspacioController;
 use App\Http\Controllers\PrestamoController;
@@ -38,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('libros', LibroController::class);
     Route::resource('usuarios', UserController::class);
+    Route::get('/configuracion', [ConfiguracionController::class, 'edit'])->name('configuracion.edit');
+    Route::put('/configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 
 
 

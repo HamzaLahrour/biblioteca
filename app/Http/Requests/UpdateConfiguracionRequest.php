@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateReservaRequest extends FormRequest
+class UpdateConfiguracionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,18 +23,16 @@ class UpdateReservaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'configuraciones'         => 'required|array',
+            'configuraciones.*'       => 'nullable|string|max:255',
         ];
     }
 
-
-
-
-
-    private function validarHorarioBiblioteca($validator): void {}
-
-    private function validarDuracion($validator): void {}
-    private function validarSolapamientoEspacio($validator): void {}
-    private function validarSolapamientoUsuario($validator): void {}
-    private function validarLimiteReservas($validator): void {}
+    public function messages(): array
+    {
+        return [
+            'configuraciones.required' => 'No hay configuraciones que guardar.',
+            'configuraciones.array'    => 'El formato de las configuraciones no es válido.',
+        ];
+    }
 }
