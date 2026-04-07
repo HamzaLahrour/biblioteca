@@ -157,7 +157,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{ route('reservas.index') }}" class="nav-link">
                                 <i class="bi bi-calendar-check"></i> Reservas Activas
                             </a>
                         </li>

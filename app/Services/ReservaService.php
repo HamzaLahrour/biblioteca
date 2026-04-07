@@ -41,12 +41,12 @@ class ReservaService
             $this->validarDisponibilidadReal($espacio, $datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
 
             return Reserva::create([
-                'user_id'     => $userId,
-                'espacio_id'  => $espacio->id,
-                'fecha'       => $datos['fecha'],
-                'hora_inicio' => $datos['hora_inicio'],
-                'hora_fin'    => $datos['hora_fin'],
-                'estado'      => 'activa',
+                'user_id'       => $userId,
+                'espacio_id'    => $espacio->id,
+                'fecha_reserva' => $datos['fecha'], // El formulario manda 'fecha', se guarda en 'fecha_reserva'
+                'hora_inicio'   => $datos['hora_inicio'],
+                'hora_fin'      => $datos['hora_fin'],
+                'estado'        => 'activa',
             ]);
         });
     }
@@ -128,7 +128,12 @@ class ReservaService
     private function validarHorasDiarias($userId, $fecha, $horaInicio, $horaFin)
     {
         $minutosMaximos = Configuracion::get('max_horas_diarias', 360);
-        $reservasHoy = Reserva::where('user_id', $userId)->where('fecha', $fecha)->where('estado', 'activa')->get();
+
+        // CORRECCIÓN: 'fecha_reserva'
+        $reservasHoy = Reserva::where('user_id', $userId)
+            ->where('fecha_reserva', $fecha)
+            ->where('estado', 'activa')
+            ->get();
 
         $minutosConsumidos = 0;
         foreach ($reservasHoy as $reserva) {
@@ -145,10 +150,12 @@ class ReservaService
 
     private function validarSolapamientoUsuario($userId, $fecha, $horaInicio, $horaFin)
     {
+        // CORRECCIÓN: 'fecha_reserva'
         $solapamiento = Reserva::where('user_id', $userId)
-            ->whereDate('fecha', $fecha)
+            ->whereDate('fecha_reserva', $fecha)
             ->where('hora_inicio', '<', $horaFin)
             ->where('hora_fin', '>', $horaInicio)
+            ->where('estado', 'activa') // Añadido para que las canceladas no cuenten como solapamiento
             ->exists();
 
         if ($solapamiento) {
@@ -159,7 +166,7 @@ class ReservaService
     private function validarEspacioActivoYCapacidad($espacioId)
     {
         $espacio = Espacio::find($espacioId);
-        if (!$espacio || !$espacio->activo) {
+        if (!$espacio || !$espacio->disponible) {
             throw new Exception('El espacio seleccionado no existe o está en mantenimiento.');
         }
         if ($espacio->capacidad <= 0) {
@@ -173,8 +180,10 @@ class ReservaService
         $inicioExpandido = Carbon::createFromTimeString($horaInicio)->subMinutes($antelacion)->format('H:i:s');
         $finExpandido = Carbon::createFromTimeString($horaFin)->addMinutes($antelacion)->format('H:i:s');
 
+        // CORRECCIÓN: 'fecha_reserva'
         $hayChoque = Reserva::where('espacio_id', $espacioId)
-            ->where('fecha', $fecha)
+            ->where('fecha_reserva', $fecha)
+            ->where('estado', 'activa') // Añadido para ignorar canceladas
             ->where('hora_inicio', '<', $finExpandido)
             ->where('hora_fin', '>', $inicioExpandido)
             ->exists();
@@ -186,8 +195,9 @@ class ReservaService
 
     private function validarDisponibilidadReal($espacio, $fecha, $horaInicio, $horaFin)
     {
+        // CORRECCIÓN: 'fecha_reserva'
         $numeroSolapamiento = Reserva::where('espacio_id', $espacio->id)
-            ->where('fecha', $fecha)
+            ->where('fecha_reserva', $fecha)
             ->where('estado', 'activa')
             ->where('hora_inicio', '<', $horaFin)
             ->where('hora_fin', '>', $horaInicio)
@@ -214,6 +224,7 @@ class ReservaService
             throw new Exception('El centro permanece cerrado los fines de semana.');
         }
 
+        // Aquí sí se queda 'fecha' porque la tabla Festivo usa esa columna
         $motivoFestivo = Festivo::where('fecha', $fecha)->value('motivo');
         if ($motivoFestivo) {
             throw new Exception("El centro estará cerrado ese día por ser festivo: {$motivoFestivo}.");

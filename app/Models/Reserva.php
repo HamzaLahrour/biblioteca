@@ -13,18 +13,19 @@ class Reserva extends Model
     use HasUuids;
 
 
-    public function libro()
-    {
-        return $this->belongsTo(Libro::class);
-    }
 
     public function espacio()
     {
         return $this->belongsTo(Espacio::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     protected $fillable = [
-        'usuario_id',
+        'user_id',
         'espacio_id',
         'fecha_reserva',
         'hora_inicio',

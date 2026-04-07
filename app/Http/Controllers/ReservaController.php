@@ -9,6 +9,7 @@ use App\Http\Requests\StoreReservaRequest;
 use App\Services\ReservaService;
 use App\Models\Reserva;
 use App\Models\Espacio;
+use App\Models\User;
 
 use Exception;
 
@@ -33,9 +34,9 @@ class ReservaController extends Controller
         // Si es admin, ve TODAS las reservas. Si es alumno, solo las suyas.
         if ($usuario->rol === 'admin') {
             // Usamos 'with' para evitar el problema de N+1 consultas (Optimización)
-            $reservas = Reserva::with(['user', 'espacio'])->orderBy('fecha', 'desc')->paginate(10);
+            $reservas = Reserva::with(['user', 'espacio'])->orderBy('fecha_reserva', 'desc')->paginate(10);
         } else {
-            $reservas = $usuario->reservas()->with('espacio')->orderBy('fecha', 'desc')->paginate(10);
+            $reservas = $usuario->reservas()->with('espacio')->orderBy('fecha_reserva', 'desc')->paginate(10);
         }
 
         return view('reservas.index', compact('reservas'));
@@ -46,9 +47,14 @@ class ReservaController extends Controller
      */
     public function create()
     {
-        $espacios = Espacio::where('activo', true)->get();
+        $espacios = Espacio::where('disponible', true)->get();
 
-        return view('reservas.create', compact('espacios'));
+        $usuarios = [];
+        if (auth()->user()->rol === 'admin') {
+            $usuarios = User::orderBy('name')->get();
+        }
+
+        return view('reservas.create', compact('espacios', 'usuarios'));
     }
 
     /**
@@ -96,47 +102,26 @@ class ReservaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Reserva $reserva)
-    {
-        // 🛡️ BARRERA DE SEGURIDAD: Evitar que un alumno edite la reserva de otro
-        // cambiando el ID en la URL (ej: tusitio.com/reservas/5/edit)
-        if (auth()->id() !== $reserva->user_id && auth()->user()->rol !== 'admin') {
-            abort(403, 'Acceso denegado: No puedes editar una reserva que no es tuya.');
-        }
-
-        $espacios = Espacio::where('activo', true)->get();
-
-        return view('reservas.edit', compact('reserva', 'espacios'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(StoreReservaRequest $request, Reserva $reserva)
-    {
-        // 🛡️ Misma barrera de seguridad por si envían el formulario hackeado
-        if (auth()->id() !== $reserva->user_id && auth()->user()->rol !== 'admin') {
-            abort(403, 'Acceso denegado.');
-        }
-
-        try {
-            // El mesero coge la comanda limpia y se la pasa al Chef para que actualice
-            $datosValidados = $request->validated();
-
-            // Llama a un método del Servicio que tendremos que crear luego
-            $this->reservaService->actualizarReserva($reserva, $datosValidados, auth()->id());
-
-            return redirect()->route('reservas.index')->with('success', '¡Reserva modificada correctamente!');
-        } catch (Exception $e) {
-            return back()->withErrors(['error_reserva' => $e->getMessage()])->withInput();
-        }
-    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Reserva $reserva)
     {
-        //
+        // 1. Barrera de seguridad: ¡Nada de cancelar la reserva del vecino!
+        if (auth()->id() !== $reserva->user_id && auth()->user()->rol !== 'admin') {
+            abort(403, 'Acceso denegado: No puedes cancelar reservas de otra persona.');
+        }
+
+        // 2. Control de listillos: No puedes cancelar una reserva que ya pasó
+        if (\Carbon\Carbon::parse($reserva->fecha . ' ' . $reserva->hora_inicio)->isPast()) {
+            return back()->withErrors(['error_general' => 'No puedes cancelar una reserva que ya ha comenzado o pasado.']);
+        }
+
+        // 3. Cancelamos (liberamos el espacio mágicamente para todos los demás)
+        $reserva->update(['estado' => 'cancelada']);
+
+        return redirect()->route('reservas.index')
+            ->with('success', 'Tu reserva ha sido cancelada. El espacio vuelve a estar libre.');
     }
 }

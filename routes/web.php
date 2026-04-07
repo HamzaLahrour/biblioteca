@@ -48,6 +48,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/festivos/{id}', [FestivoController::class, 'destroy'])->name('festivos.destroy');
 
 
+    Route::resource('reservas', ReservaController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+
 
     // Aquí irán más adelante:
     // Route::resource('libros', LibroController::class);
