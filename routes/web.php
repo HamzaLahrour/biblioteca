@@ -9,6 +9,7 @@ use App\Http\Controllers\EspacioController;
 use App\Http\Controllers\PrestamoController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\TipoEspacioController;
+use App\Http\Controllers\FestivoController;
 
 
 // Auth
@@ -41,6 +42,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('usuarios', UserController::class);
     Route::get('/configuracion', [ConfiguracionController::class, 'edit'])->name('configuracion.edit');
     Route::put('/configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+
+    Route::get('/admin/festivos', [FestivoController::class, 'index'])->name('festivos.index');
+    Route::post('/admin/festivos', [FestivoController::class, 'store'])->name('festivos.store');
+    Route::delete('/admin/festivos/{id}', [FestivoController::class, 'destroy'])->name('festivos.destroy');
 
 
 
