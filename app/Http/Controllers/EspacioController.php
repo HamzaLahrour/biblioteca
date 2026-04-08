@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Espacio;
 use App\Http\Requests\StoreEspacioRequest;
 use App\Http\Requests\UpdateEspacioRequest;
-use App\Models\TipoEspacio; 
+use App\Models\TipoEspacio;
 
 class EspacioController extends Controller
 {
@@ -15,7 +15,7 @@ class EspacioController extends Controller
      */
     public function index()
     {
-        $espacios=Espacio::orderBy('nombre')->paginate(10);
+        $espacios = Espacio::orderBy('nombre')->paginate(10);
         return view('espacios.index', compact('espacios'));
     }
 
@@ -25,7 +25,7 @@ class EspacioController extends Controller
     public function create()
     {
         $tipos = TipoEspacio::orderBy('nombre')->get();
-        return view('espacios.create',compact('tipos'));
+        return view('espacios.create', compact('tipos'));
     }
 
     /**
@@ -34,9 +34,8 @@ class EspacioController extends Controller
     public function store(StoreEspacioRequest $request)
     {
         Espacio::create($request->validated());
-        
-        return redirect()->route('espacios.index')->with('succes','Espacio creado con éxito');
 
+        return redirect()->route('espacios.index')->with('succes', 'Espacio creado con éxito');
     }
 
     /**
@@ -44,8 +43,38 @@ class EspacioController extends Controller
      */
     public function show(Espacio $espacio)
     {
-        $espacio->load('reservas'); 
-        return view('espacios.show', compact('espacio'));
+        // 1. Preparamos la consulta (sin ejecutarla aún)
+        $query = $espacio->reservas()->with('user');
+
+        // 2. Aplicamos filtros dinámicos leyendo la URL con el helper global
+        if (request()->filled('fecha_inicio')) {
+            $query->whereDate('fecha_reserva', '>=', request('fecha_inicio'));
+        }
+
+        if (request()->filled('fecha_fin')) {
+            $query->whereDate('fecha_reserva', '<=', request('fecha_fin'));
+        }
+
+        if (request()->filled('estado')) {
+            $query->where('estado', request('estado'));
+        }
+
+        // 3. Calculamos las métricas para las tarjetas superiores
+        $metricas = [
+            'historico'   => $espacio->reservas()->count(),
+            'activas_hoy' => $espacio->reservas()
+                ->whereDate('fecha_reserva', today())
+                ->where('estado', 'activa')
+                ->count(),
+            'canceladas'  => $espacio->reservas()->where('estado', 'cancelada')->count(),
+        ];
+
+        // 4. Ejecutamos la consulta final con ordenación y paginación
+        $reservas = $query->orderBy('fecha_reserva', 'desc')
+            ->orderBy('hora_inicio', 'desc')
+            ->paginate(10);
+
+        return view('espacios.show', compact('espacio', 'reservas', 'metricas'));
     }
 
     /**
@@ -54,8 +83,7 @@ class EspacioController extends Controller
     public function edit(Espacio $espacio)
     {
         $tipos = TipoEspacio::orderBy('nombre')->get();
-        return view('espacios.edit',compact('espacio','tipos'));
-
+        return view('espacios.edit', compact('espacio', 'tipos'));
     }
 
     /**
@@ -64,10 +92,10 @@ class EspacioController extends Controller
     public function update(UpdateEspacioRequest $request, Espacio $espacio)
     {
         $espacio->fill($request->validated());
-        
+
         if (!$espacio->isDirty()) {
             return redirect()->route('espacios.index')
-            ->with('info', 'No realizaste ningún cambio.');
+                ->with('info', 'No realizaste ningún cambio.');
         }
 
         $espacio->save();
@@ -83,12 +111,12 @@ class EspacioController extends Controller
     {
         if ($espacio->reservas()->count() > 0) {
             return redirect()->route('espacios.index')
-                             ->with('error', 'No puedes borrar un espacio que contenga reservas.');
+                ->with('error', 'No puedes borrar un espacio que contenga reservas.');
         }
 
         $espacio->delete();
 
         return redirect()->route('espacios.index')
-                         ->with('success', 'Espacio eliminado con éxito.');
+            ->with('success', 'Espacio eliminado con éxito.');
     }
 }
