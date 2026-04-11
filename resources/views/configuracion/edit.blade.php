@@ -53,10 +53,10 @@
                 <div class="card-body p-4 pt-3 border-top">
                     <div class="row g-4">
                         @foreach($configs as $config)
-                        <div class="col-md-6">
+                        <div class="{{ $config->tipo === 'json' ? 'col-12' : 'col-md-6' }}">
                             <div class="form-group h-100 d-flex flex-column justify-content-between bg-white p-3 rounded-3 border">
 
-                                <div>
+                                <div class="mb-3">
                                     <label for="{{ $config->clave }}" class="form-label fw-bold text-dark mb-1">
                                         {{ $config->etiqueta }}
                                     </label>
@@ -86,6 +86,63 @@
                                         class="form-control bg-light"
                                         value="{{ old('configuraciones.'.$config->clave, $config->valor) }}">
 
+                                    @elseif($config->tipo === 'json')
+                                    @php
+                                    // Intentamos pillar lo que haya enviado (si hay error) o decodificamos lo de la BD
+                                    $valorActual = old('configuraciones.'.$config->clave, json_decode($config->valor, true));
+                                    if(is_string($valorActual)) {
+                                    $valorActual = json_decode($valorActual, true);
+                                    }
+                                    $diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+                                    @endphp
+
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Día</th>
+                                                    <th>Abierto</th>
+                                                    <th>Apertura</th>
+                                                    <th>Cierre</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($diasSemana as $dia)
+                                                @php
+                                                $dataDia = $valorActual[$dia] ?? ['abierto' => false, 'apertura' => '', 'cierre' => ''];
+                                                // Manejar que 'abierto' pueda venir como string 'true'/'false' del formulario
+                                                $isAbierto = filter_var($dataDia['abierto'], FILTER_VALIDATE_BOOLEAN);
+                                                @endphp
+                                                <tr>
+                                                    <td class="text-capitalize fw-bold">{{ $dia }}</td>
+                                                    <td>
+                                                        <div class="form-check form-switch fs-5 mb-0">
+                                                            <input type="hidden" name="configuraciones[{{ $config->clave }}][{{ $dia }}][abierto]" value="false">
+                                                            <input class="form-check-input switch-dia" type="checkbox" role="switch"
+                                                                data-dia="{{ $dia }}"
+                                                                name="configuraciones[{{ $config->clave }}][{{ $dia }}][abierto]"
+                                                                value="true"
+                                                                {{ $isAbierto ? 'checked' : '' }}>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input type="time" class="form-control form-control-sm input-hora-{{ $dia }}"
+                                                            name="configuraciones[{{ $config->clave }}][{{ $dia }}][apertura]"
+                                                            value="{{ $dataDia['apertura'] ?? '' }}"
+                                                            {{ $isAbierto ? '' : 'disabled' }}>
+                                                    </td>
+                                                    <td>
+                                                        <input type="time" class="form-control form-control-sm input-hora-{{ $dia }}"
+                                                            name="configuraciones[{{ $config->clave }}][{{ $dia }}][cierre]"
+                                                            value="{{ $dataDia['cierre'] ?? '' }}"
+                                                            {{ $isAbierto ? '' : 'disabled' }}>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
                                     @else
                                     <input type="text" name="configuraciones[{{ $config->clave }}]" id="{{ $config->clave }}"
                                         class="form-control bg-light"
@@ -110,4 +167,24 @@
 
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const switches = document.querySelectorAll('.switch-dia');
+
+        switches.forEach(function(toggle) {
+            toggle.addEventListener('change', function() {
+                const dia = this.getAttribute('data-dia');
+                const inputs = document.querySelectorAll('.input-hora-' + dia);
+
+                inputs.forEach(function(input) {
+                    input.disabled = !toggle.checked;
+                    if (!toggle.checked) {
+                        input.value = ''; // Opcional: limpiar la hora si cierran
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection

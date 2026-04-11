@@ -19,27 +19,19 @@ class ConfiguracionSeeder extends Seeder
             // ─── HORARIO ────────────────────────────────────────────
             [
                 'seccion'     => 'horario',
-                'clave'       => 'hora_apertura',
-                'valor'       => '09:00',
-                'tipo'        => 'time',
-                'etiqueta'    => 'Hora de apertura',
-                'descripcion' => 'Hora a la que abre la biblioteca cada día.',
-            ],
-            [
-                'seccion'     => 'horario',
-                'clave'       => 'hora_cierre',
-                'valor'       => '21:00',
-                'tipo'        => 'time',
-                'etiqueta'    => 'Hora de cierre',
-                'descripcion' => 'Hora a la que cierra la biblioteca cada día.',
-            ],
-            [
-                'seccion'     => 'horario',
-                'clave'       => 'dias_apertura',
-                'valor'       => 'lunes,martes,miercoles,jueves,viernes',
-                'tipo'        => 'string',
-                'etiqueta'    => 'Días de apertura',
-                'descripcion' => 'Días en los que la biblioteca abre.',
+                'clave'       => 'horario_semanal',
+                'valor'       => json_encode([
+                    'lunes'     => ['abierto' => false, 'apertura' => null,    'cierre' => null],
+                    'martes'    => ['abierto' => true,  'apertura' => '09:00', 'cierre' => '21:00'],
+                    'miercoles' => ['abierto' => true,  'apertura' => '09:00', 'cierre' => '21:00'],
+                    'jueves'    => ['abierto' => true,  'apertura' => '09:00', 'cierre' => '21:00'],
+                    'viernes'   => ['abierto' => true,  'apertura' => '09:00', 'cierre' => '21:00'],
+                    'sabado'    => ['abierto' => true,  'apertura' => '10:00', 'cierre' => '14:00'],
+                    'domingo'   => ['abierto' => false, 'apertura' => null,    'cierre' => null],
+                ]),
+                'tipo'        => 'json',
+                'etiqueta'    => 'Horario de apertura semanal',
+                'descripcion' => 'Configura qué días abre la biblioteca y en qué horario específico.',
             ],
 
             // ─── RESERVAS ───────────────────────────────────────────
@@ -119,11 +111,19 @@ class ConfiguracionSeeder extends Seeder
             ],
             [
                 'seccion'     => 'prestamos',
-                'clave'       => 'dias_gracia',
-                'valor'       => '2',
+                'clave'       => 'min_dias_prestamo',
+                'valor'       => '3',
                 'tipo'        => 'integer',
-                'etiqueta'    => 'Días de gracia antes de sancionar',
-                'descripcion' => 'Días extra antes de generar una sanción por retraso.',
+                'etiqueta'    => 'Mínimo de días para solicitar un préstamo',
+                'descripcion' => 'Número mínimo de días por los que un usuario puede solicitar un préstamo.',
+            ],
+            [
+                'seccion'     => 'prestamos',
+                'clave' => 'max_renovaciones',
+                'valor'       => '2', // Límite por defecto (2 renovaciones suele ser el estándar)
+                'tipo'        => 'numero',
+                'etiqueta'    => 'Límite Máximo de Renovaciones',
+                'descripcion' => 'Número máximo de veces que un alumno puede ampliar el tiempo de un mismo préstamo activo.',
             ],
 
             // ─── SANCIONES ──────────────────────────────────────────

@@ -37,4 +37,9 @@ class Sancion extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function prestamo(): BelongsTo
+    {
+        return $this->belongsTo(Prestamo::class);
+    }
 }

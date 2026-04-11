@@ -23,6 +23,10 @@ return new class extends Migration
             $table->date('fecha_devolucion_prevista');
             $table->date('fecha_devolucion_real')->nullable();
 
+            $table->integer('renovaciones')->default(0);
+            $table->integer('dias_retraso')->default(0);
+            $table->text('observaciones')->nullable();
+
             // Estado: activo, devuelto, retrasado...
             $table->string('estado')->default('activo');
             $table->timestamps();

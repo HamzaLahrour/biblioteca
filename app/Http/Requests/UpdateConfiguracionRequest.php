@@ -24,7 +24,8 @@ class UpdateConfiguracionRequest extends FormRequest
     {
         return [
             'configuraciones'         => 'required|array',
-            'configuraciones.*'       => 'nullable|string|max:255',
+            'configuraciones.horario_semanal' => 'nullable|array',
+            'configuraciones.*'       => 'nullable',
         ];
     }
 

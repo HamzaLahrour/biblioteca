@@ -16,6 +16,8 @@ return new class extends Migration
 
             // Corregido a foreignId y user_id para que coincida con la tabla users
             $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('prestamo_id')->nullable()->after('user_id')
+                ->constrained('prestamos')->onDelete('cascade');
 
             $table->text('razon');
             $table->date('fecha_inicio');
@@ -34,5 +36,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('sanciones');
+
+        Schema::table('sanciones', function (Blueprint $table) {
+            $table->dropForeign(['prestamo_id']);
+            $table->dropColumn('prestamo_id');
+        });
     }
 };
