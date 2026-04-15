@@ -51,6 +51,17 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('reservas', ReservaController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
 
 
+    // Préstamos - CRUD Base (Bloqueamos edit, update y destroy por seguridad)
+    Route::resource('prestamos', PrestamoController::class)->except(['edit', 'update', 'destroy']);
+
+    // Préstamos - Acciones Específicas de la Biblioteca (Siempre POST)
+    Route::prefix('prestamos/{prestamo}')->name('prestamos.')->group(function () {
+        Route::post('/devolver', [PrestamoController::class, 'devolver'])->name('devolver');
+        Route::post('/renovar', [PrestamoController::class, 'renovar'])->name('renovar');
+        Route::post('/perdido', [PrestamoController::class, 'perdido'])->name('perdido');
+    });
+
+
     // Aquí irán más adelante:
     // Route::resource('libros', LibroController::class);
     // Route::resource('espacios', EspacioController::class);

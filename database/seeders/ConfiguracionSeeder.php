@@ -125,6 +125,22 @@ class ConfiguracionSeeder extends Seeder
                 'etiqueta'    => 'Límite Máximo de Renovaciones',
                 'descripcion' => 'Número máximo de veces que un alumno puede ampliar el tiempo de un mismo préstamo activo.',
             ],
+            [
+                'seccion'     => 'prestamos',
+                'clave'       => 'dias_sancion_por_dia',
+                'valor'       => '2',
+                'tipo'        => 'integer',
+                'etiqueta'    => 'Días de sanción por cada día de retraso',
+                'descripcion' => 'Multiplicador de días de castigo por cada día de retraso.',
+            ],
+            [
+                'seccion'     => 'prestamos',
+                'clave'       => 'dias_sancion_perdida',
+                'valor'       => '30',
+                'tipo'        => 'integer',
+                'etiqueta'    => 'Días de sanción por libro perdido',
+                'descripcion' => 'Días de sanción cuando un usuario pierde un libro.',
+            ],
 
             // ─── SANCIONES ──────────────────────────────────────────
             [

@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sanciones', function (Blueprint $table) {
-            $table->foreignUuid('prestamo_id')->nullable()->after('user_id')
-                ->constrained('prestamos')->onDelete('cascade');
+        Schema::table('libros', function (Blueprint $table) {
+            $table->string('estado')->default('disponible')->after('copias_totales');
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sanciones', function (Blueprint $table) {
-            $table->dropForeign(['prestamo_id']);
-            $table->dropColumn('prestamo_id');
+        Schema::table('libros', function (Blueprint $table) {
+            $table->dropColumn('estado');
         });
     }
 };

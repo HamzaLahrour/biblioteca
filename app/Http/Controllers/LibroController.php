@@ -7,6 +7,7 @@ use App\Http\Requests\StoreLibroRequest;
 use App\Http\Requests\UpdateLibroRequest;
 use App\Models\Libro;
 use App\Models\Categoria;
+use App\Models\Prestamo;
 
 class LibroController extends Controller
 {
@@ -15,8 +16,35 @@ class LibroController extends Controller
      */
     public function index()
     {
-        $libros = Libro::orderBy('titulo')->paginate(10);
-        return view('libros.index', compact('libros'));
+        // Iniciamos la consulta cargando la relación para evitar N+1
+        $query = \App\Models\Libro::with('categoria');
+
+        // 1. Buscador de Texto Libre (Título, Autor o ISBN)
+        $query->when(request('buscar'), function ($q, $buscar) {
+            $q->where(function ($q2) use ($buscar) {
+                $q2->where('titulo', 'like', "%{$buscar}%")
+                    ->orWhere('autor', 'like', "%{$buscar}%")
+                    ->orWhere('isbn', 'like', "%{$buscar}%");
+            });
+        });
+
+        // 2. Filtro de Categoría
+        $query->when(request('categoria_id'), function ($q, $categoria) {
+            $q->where('categoria_id', $categoria);
+        });
+
+        // 3. Filtro de Estado (Si implementamos la columna 'estado')
+        $query->when(request('estado'), function ($q, $estado) {
+            $q->where('estado', $estado);
+        });
+
+        // Ordenamos alfabéticamente por defecto
+        $libros = $query->orderBy('titulo', 'asc')->paginate(15);
+
+        // Traemos las categorías para llenar el desplegable del filtro
+        $categorias = \App\Models\Categoria::orderBy('nombre')->get();
+
+        return view('libros.index', compact('libros', 'categorias'));
     }
 
     /**
@@ -79,9 +107,9 @@ class LibroController extends Controller
      */
     public function destroy(Libro $libro)
     {
-        if ($libro->reservas()->count() > 0) {
+        if ($libro->prestamos()->count() > 0) {
             return redirect()->route('libros.index')
-                ->with('error', 'No puedes borrar un libro que contenga reservas.');
+                ->with('error', 'No puedes borrar un libro que contenga prestamos.');
         }
 
         $libro->delete();

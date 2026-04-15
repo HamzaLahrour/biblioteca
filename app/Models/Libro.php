@@ -22,6 +22,11 @@ class Libro extends Model
     }
 
 
+    public function getDisponiblesAttribute()
+    {
+        $prestados = $this->prestamos()->where('estado', 'activo')->count();
+        return $this->copias_totales - $prestados;
+    }
 
     protected $fillable = [
         'categoria_id',

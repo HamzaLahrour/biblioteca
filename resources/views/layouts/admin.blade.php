@@ -135,8 +135,8 @@
 
                         <h6 class="sidebar-heading">C. Préstamos</h6>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="bi bi-arrow-left-right"></i> Préstamos Activos
+                            <a href="{{ route('prestamos.index') }}" class="nav-link">
+                                <i class="bi bi-arrow-left-right"></i> Gestion de Prestamos
                             </a>
                         </li>
                         <li class="nav-item">
@@ -236,6 +236,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
+    <script>
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert:not(.alert-important)');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 3500); // Se cierra a los 3.5 segundos
+    </script>
 
 </body>
 

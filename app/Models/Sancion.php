@@ -17,6 +17,7 @@ class Sancion extends Model
 
     protected $fillable = [
         'user_id',
+        'prestamo_id',
         'razon',
         'fecha_inicio',
         'fecha_fin',
