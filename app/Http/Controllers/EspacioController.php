@@ -15,8 +15,36 @@ class EspacioController extends Controller
      */
     public function index()
     {
-        $espacios = Espacio::orderBy('nombre')->paginate(10);
-        return view('espacios.index', compact('espacios'));
+        // Cargamos la relación para evitar el problema N+1
+        $query = \App\Models\Espacio::with('tipoEspacio');
+
+        // 1. Buscador de Texto Libre (Nombre, Código o Ubicación)
+        $query->when(request('buscar'), function ($q, $buscar) {
+            $q->where(function ($q2) use ($buscar) {
+                $q2->where('nombre', 'like', "%{$buscar}%")
+                    ->orWhere('codigo', 'like', "%{$buscar}%")
+                    ->orWhere('ubicacion', 'like', "%{$buscar}%");
+            });
+        });
+
+        // 2. Filtro por Tipo de Espacio
+        $query->when(request('tipo_espacio_id'), function ($q, $tipo) {
+            $q->where('tipo_espacio_id', $tipo);
+        });
+
+        // 3. Filtro por Disponibilidad (Estado operativo)
+        $query->when(request()->has('estado') && request('estado') !== '', function ($q) {
+            $estado = request('estado') === 'disponible' ? 1 : 0;
+            $q->where('disponible', $estado);
+        });
+
+        // Ordenamos alfabéticamente por nombre
+        $espacios = $query->orderBy('nombre', 'asc')->paginate(15);
+
+        // Traemos los tipos para el desplegable del filtro
+        $tipos = \App\Models\TipoEspacio::orderBy('nombre')->get();
+
+        return view('espacios.index', compact('espacios', 'tipos'));
     }
 
     /**

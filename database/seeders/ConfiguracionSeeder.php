@@ -92,6 +92,7 @@ class ConfiguracionSeeder extends Seeder
                 'descripcion' => 'Minutos de margen entre una reserva y la siguiente en el mismo espacio.',
             ],
 
+
             // ─── PRÉSTAMOS ──────────────────────────────────────────
             [
                 'seccion'     => 'prestamos',

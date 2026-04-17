@@ -71,8 +71,36 @@ class LibroController extends Controller
      */
     public function show(Libro $libro)
     {
-        $libro->load('prestamos');
-        return view('libros.show', compact('libro'));
+
+        // 1. CALCULADORA DE MINI-ESTADÍSTICAS (Sobre TODOS los préstamos del libro)
+        $stats = [
+            'total'     => $libro->prestamos()->count(),
+            'activos'   => $libro->prestamos()->where('estado', 'activo')->count(),
+            'devueltos' => $libro->prestamos()->whereIn('estado', ['devuelto', 'devuelto_tarde'])->count(),
+            'perdidos'  => $libro->prestamos()->where('estado', 'perdido')->count(),
+        ];
+
+        // 2. DISPONIBILIDAD REAL
+        // Si tu modelo no tiene un campo 'disponibles', lo calculamos al vuelo:
+        $disponibles = $libro->disponibles ?? ($libro->copias_totales - $stats['activos']);
+
+        // 3. CONSULTA DE PRÉSTAMOS PARA LA TABLA
+        $query = $libro->prestamos()->with('user');
+
+        $query->when(request('buscar_lector'), function ($q, $buscar) {
+            $q->whereHas('user', function ($q2) use ($buscar) {
+                $q2->where('name', 'like', "%{$buscar}%")
+                    ->orWhere('email', 'like', "%{$buscar}%");
+            });
+        });
+
+        $query->when(request('estado_prestamo'), function ($q, $estado) {
+            $q->where('estado', $estado);
+        });
+
+        $prestamos = $query->orderBy('fecha_prestamo', 'desc')->paginate(10);
+
+        return view('libros.show', compact('libro', 'prestamos', 'stats', 'disponibles'));
     }
 
     /**

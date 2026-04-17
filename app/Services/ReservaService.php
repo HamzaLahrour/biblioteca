@@ -21,8 +21,6 @@ class ReservaService
         $userId = $datos['user_id'] ?? $usuarioLogueadoId;
 
         $this->validarPermisoUsuario($userId, $usuarioLogueadoId);
-        $this->validarDiaCierre($datos['fecha']);
-        $this->validarHorarioBiblioteca($datos['hora_inicio'], $datos['hora_fin']);
         $this->validarHoraNoPasada($datos['fecha'], $datos['hora_inicio']);
         $this->validarAntelacionMinima($datos['fecha'], $datos['hora_inicio']);
         $this->validarAntelacionMaxima($datos['fecha']);
@@ -32,6 +30,9 @@ class ReservaService
         $this->validarHorasDiarias($userId, $datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
         $this->validarSolapamientoUsuario($userId, $datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
         $this->validarEspacioActivoYCapacidad($datos['espacio_id']);
+
+        $this->validarHorarioSemanalJSON($datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
+        $this->validarFestivo($datos['fecha']);
 
         return DB::transaction(function () use ($datos, $userId) {
 
@@ -53,42 +54,64 @@ class ReservaService
 
     // --- FUNCIONES PRIVADAS (Usando tu método Configuracion::get) ---
 
-    private function validarHorarioBiblioteca($horaInicial, $horaFinal)
+    private function validarHorarioSemanalJSON($fecha, $horaInicio, $horaFin)
     {
-        $horaInicioBib = Configuracion::get('hora_apertura', '08:00');
-        $horaFinBib = Configuracion::get('hora_cierre', '21:00');
+        $horarioJson = Configuracion::get('horario_semanal');
 
-        if ($horaInicial < $horaInicioBib || $horaFinal > $horaFinBib) {
-            throw new Exception("El horario de la biblioteca es de {$horaInicioBib} a {$horaFinBib}.");
+        if (!$horarioJson) return;
+
+        // 1. BLINDAJE: Si Laravel ya lo hizo array, no lo decodificamos otra vez
+        $horarioSemanal = is_string($horarioJson) ? json_decode($horarioJson, true) : $horarioJson;
+
+        $fechaParseada = Carbon::parse($fecha);
+
+        $mapaDias = [
+            1 => 'lunes',
+            2 => 'martes',
+            3 => 'miercoles',
+            4 => 'jueves',
+            5 => 'viernes',
+            6 => 'sabado',
+            7 => 'domingo'
+        ];
+
+        $nombreDia = $mapaDias[$fechaParseada->dayOfWeekIso];
+        $horarioHoy = $horarioSemanal[$nombreDia] ?? null;
+
+        // 2. BLINDAJE: filter_var entiende '1', 'true', o true como Válido.
+        $estaAbierto = $horarioHoy && filter_var($horarioHoy['abierto'], FILTER_VALIDATE_BOOLEAN);
+
+        if (!$estaAbierto) {
+            throw new Exception("La biblioteca permanece cerrada los " . ucfirst($nombreDia) . "s.");
+        }
+
+        // 3. Validamos horas (Cambiamos el formato por si el json dice "09:00" y la hora dice "09:00:00")
+        $horaInicioReserva = Carbon::parse($horaInicio)->format('H:i');
+        $horaFinReserva = Carbon::parse($horaFin)->format('H:i');
+        $apertura = Carbon::parse($horarioHoy['apertura'])->format('H:i');
+        $cierre = Carbon::parse($horarioHoy['cierre'])->format('H:i');
+
+        if ($horaInicioReserva < $apertura || $horaFinReserva > $cierre) {
+            throw new Exception("El horario de los " . ucfirst($nombreDia) . "s es de {$apertura} a {$cierre}.");
         }
     }
 
     private function validarHoraNoPasada($fecha, $horaInicio)
     {
-        if (Carbon::parse($fecha)->isToday() && Carbon::parse($horaInicio)->isPast()) {
+        $fechaHoraReserva = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $fecha . ' ' . $horaInicio,
+            'Europe/Madrid'
+        );
+
+        if ($fechaHoraReserva->lessThan(now())) {
             throw new Exception("La hora que intentas reservar ya pasó.");
         }
     }
 
-    private function validarAntelacionMinima($fecha, $horaInicio)
-    {
-        $antelacion = Configuracion::get('antelacion_minima', 30);
-        $inicioReserva = Carbon::parse($fecha . ' ' . $horaInicio);
 
-        if (Carbon::now()->diffInMinutes($inicioReserva, false) < $antelacion) {
-            throw new Exception("Debes reservar con al menos {$antelacion} minutos de antelación.");
-        }
-    }
 
-    private function validarAntelacionMaxima($fecha)
-    {
-        $diasAntelacion = Configuracion::get('antelacion_maxima', 15);
-        $fechaMax = Carbon::today()->addDays($diasAntelacion);
 
-        if (Carbon::parse($fecha)->greaterThan($fechaMax)) {
-            throw new Exception("No puedes reservar con más de {$diasAntelacion} días de antelación.");
-        }
-    }
 
     private function validarDuracion($horaInicio, $horaFin)
     {
@@ -218,16 +241,46 @@ class ReservaService
         }
     }
 
-    private function validarDiaCierre($fecha)
-    {
-        if (Carbon::parse($fecha)->isWeekend()) {
-            throw new Exception('El centro permanece cerrado los fines de semana.');
-        }
 
-        // Aquí sí se queda 'fecha' porque la tabla Festivo usa esa columna
+
+    /**
+     * Separamos la validación de los festivos para que quede limpia
+     */
+    private function validarFestivo($fecha)
+    {
         $motivoFestivo = Festivo::where('fecha', $fecha)->value('motivo');
         if ($motivoFestivo) {
             throw new Exception("El centro estará cerrado ese día por ser festivo: {$motivoFestivo}.");
+        }
+    }
+
+    private function validarAntelacionMinima($fecha, $horaInicio)
+    {
+        // Usamos TU clave original (30 minutos por defecto)
+        $minutosMinimos = (int) Configuracion::get('antelacion_minima', 30);
+
+        // Forzamos la zona horaria para evitar sustos con el servidor
+        $inicioReserva = Carbon::parse($fecha . ' ' . $horaInicio, 'Europe/Madrid');
+        $limiteMinimo = now('Europe/Madrid')->addMinutes($minutosMinimos);
+
+        if ($inicioReserva->isBefore($limiteMinimo)) {
+            throw new Exception("Debes reservar con al menos {$minutosMinimos} minutos de antelación.");
+        }
+    }
+
+    /**
+     * Valida que el usuario no acapare salas para dentro de 3 meses (Margen máximo a futuro)
+     */
+    private function validarAntelacionMaxima($fecha)
+    {
+        // Leemos tu nueva configuración (por defecto 7 días si falla la BD)
+        $diasMaximos = (int) Configuracion::get('dias_maximos_reserva', 7);
+
+        $inicioReserva = Carbon::parse($fecha);
+        $limiteMaximo = now()->addDays($diasMaximos)->endOfDay();
+
+        if ($inicioReserva->isAfter($limiteMaximo)) {
+            throw new Exception("Solo puedes reservar con un máximo de {$diasMaximos} días de antelación.");
         }
     }
 }

@@ -28,6 +28,9 @@ class User extends Authenticatable
 
     use HasUuids;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
 
     protected $fillable = [
         'name',

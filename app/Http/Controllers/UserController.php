@@ -12,7 +12,38 @@ class UserController extends Controller
 {
     public function index()
     {
-        $usuarios = User::orderBy('name')->paginate(10);
+        // Añadimos withCount para saber cuántos libros tiene cada uno en su casa AHORA
+        $query = \App\Models\User::where('rol', '!=', 'admin')
+            ->withCount(['prestamos' => function ($query) {
+                $query->where('estado', 'activo');
+            }]);
+
+        // 1. Buscador de Texto Libre (Nombre, Email, DNI)
+        $query->when(request('buscar'), function ($q, $buscar) {
+            $q->where(function ($q2) use ($buscar) {
+                $q2->where('name', 'like', "%{$buscar}%")
+                    ->orWhere('email', 'like', "%{$buscar}%")
+                    ->orWhere('dni', 'like', "%{$buscar}%");
+            });
+        });
+
+        // 2. EL FILTRO QUE SÍ SIRVE: Estado en la Biblioteca
+        $query->when(request('estado_lector') === 'con_prestamos', function ($q) {
+            // Filtra solo a los que tienen préstamos activos
+            $q->whereHas('prestamos', function ($p) {
+                $p->where('estado', 'activo');
+            });
+        });
+
+        // (Opcional) Si ya tienes la relación de sanciones en el modelo User:
+        $query->when(request('estado_lector') === 'sancionados', function ($q) {
+            $q->whereHas('sanciones', function ($s) {
+                $s->where('fecha_fin', '>=', \Carbon\Carbon::today());
+            });
+        });
+
+        $usuarios = $query->orderBy('created_at', 'desc')->paginate(15);
+
         return view('usuarios.index', compact('usuarios'));
     }
 
@@ -104,11 +135,19 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->route('categorias.index');
+
+            // 🌟 LA MAGIA DE LOS ROLES 🌟
+            if (Auth::user()->rol === 'admin') {
+                // Si es el bibliotecario, al panel de control
+                return redirect()->intended('/dashboard');
+            } else {
+                // Si es un alumno, a su espacio personal
+                return redirect()->intended('/mi-espacio');
+            }
         }
 
         return back()->withErrors([
-            'email' => 'El email o la contraseña son incorrectos.'
+            'email' => 'Las credenciales no coinciden con nuestros registros.',
         ])->onlyInput('email');
     }
 

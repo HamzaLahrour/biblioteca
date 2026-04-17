@@ -21,6 +21,8 @@ class Libro extends Model
         return $this->hasMany(Prestamo::class);
     }
 
+    
+
 
     public function getDisponiblesAttribute()
     {
