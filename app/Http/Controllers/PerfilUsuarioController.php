@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
-class PerfilAlumnoController extends Controller
+class PerfilUsuarioController extends Controller
 {
     public function index()
     {
