@@ -32,6 +32,9 @@ class CatalogoController extends Controller
         // Paginamos de 12 en 12 (múltiplo de 2, 3 y 4 para que la cuadrícula cuadre perfecta)
         $libros = $query->orderBy('titulo', 'asc')->paginate(12);
 
+        $query->when($request->anio, function ($q, $anio) {
+            $q->where('anio_publicacion', $anio);
+        });
         return view('catalogo.index', compact('libros', 'categorias'));
     }
 }

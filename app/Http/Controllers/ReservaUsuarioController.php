@@ -27,50 +27,34 @@ class ReservaUsuarioController extends Controller
         }])->orderBy('nombre')->get();
 
         // Carga la vista desde la NUEVA carpeta
-        return view('reservas_usuarios.index', compact('tipos'));
+        return view('reservas_usuario.index', compact('tipos'));
     }
 
     public function create(TipoEspacio $tipo)
     {
-        return view('reservas_usuarios.create', compact('tipo'));
+        return view('reservas_usuario.create', compact('tipo'));
     }
 
-    public function comprobar(Request $request, TipoEspacio $tipo)
+    public function comprobar(StoreReservaRequest $request, TipoEspacio $tipo)
     {
-        $request->validate([
-            'fecha' => 'required|date|after_or_equal:today',
-            'hora_inicio' => 'required|date_format:H:i',
-            'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
-        ]);
+        try {
+            // Le pasamos solo los datos validados al servicio
+            $espacioLibre = $this->reservaService->buscarEspacioDisponible(
+                $tipo->id,
+                $request->validated(),
+                Auth::id()
+            );
 
-        $espacios = $tipo->espacios()->where('disponible', 1)->get();
-        $espacioAsignado = null;
-
-        foreach ($espacios as $espacio) {
-            $solapamiento = Reserva::where('espacio_id', $espacio->id)
-                ->where('fecha_reserva', $request->fecha)
-                ->where('estado', 'activa')
-                ->where('hora_inicio', '<', $request->hora_fin)
-                ->where('hora_fin', '>', $request->hora_inicio)
-                ->exists();
-
-            if (!$solapamiento) {
-                $espacioAsignado = $espacio;
-                break;
-            }
+            return view('reservas_usuario.confirmar', [
+                'tipo' => $tipo,
+                'espacio' => $espacioLibre,
+                'fecha' => $request->fecha,
+                'hora_inicio' => $request->hora_inicio,
+                'hora_fin' => $request->hora_fin,
+            ]);
+        } catch (Exception $e) {
+            return back()->withErrors(['error_reserva' => $e->getMessage()])->withInput();
         }
-
-        if (!$espacioAsignado) {
-            return back()->withErrors(['error_reserva' => "No quedan espacios disponibles de tipo '{$tipo->nombre}' en este horario."])->withInput();
-        }
-
-        return view('reservas_usuarios.confirmar', [
-            'tipo' => $tipo,
-            'espacio' => $espacioAsignado,
-            'fecha' => $request->fecha,
-            'hora_inicio' => $request->hora_inicio,
-            'hora_fin' => $request->hora_fin,
-        ]);
     }
 
     public function store(StoreReservaRequest $request)
@@ -84,7 +68,7 @@ class ReservaUsuarioController extends Controller
             return redirect()->route('perfil.index')->with('success', '¡Reserva confirmada con éxito!');
         } catch (Exception $e) {
             // Redirige usando el nuevo nombre de ruta
-            return redirect()->route('reservas_usuarios.index')->withErrors(['error_reserva' => $e->getMessage()]);
+            return redirect()->route('reservas_usuario.index')->withErrors(['error_reserva' => $e->getMessage()]);
         }
     }
 }

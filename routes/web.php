@@ -11,7 +11,7 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\TipoEspacioController;
 use App\Http\Controllers\FestivoController;
 use App\Http\Controllers\CatalogoController;
-use App\Http\Controllers\PerfilAlumnoController;
+use App\Http\Controllers\PerfilUsuarioController;
 
 // ==========================================
 // 1. ZONA PÚBLICA (Sin loguear)
@@ -21,6 +21,7 @@ Route::get('/', [CatalogoController::class, 'index'])->name('catalogo.index');
 Route::prefix('usuarios')->group(function () {
     Route::get('/login', [UserController::class, 'login'])->name('login');
     Route::post('/login', [UserController::class, 'authenticate'])->name('usuarios.authenticate')->middleware('throttle:5,1');
+    Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 });
 
 
@@ -39,7 +40,20 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['can:es_usuario'])->group(function () {
 
         // Espacio del Alumno
-        Route::get('/mi-espacio', [PerfilAlumnoController::class, 'index'])->name('perfil.index');
+        Route::get('/mi-espacio', [PerfilUsuarioController::class, 'index'])->name('perfil.index');
+
+        // --- EL FLUJO DE RESERVAS ---
+        // 1. Ver catálogo de Tipos de Espacio
+        Route::get('/reservar-espacio', [App\Http\Controllers\ReservaUsuarioController::class, 'index'])->name('reservas_usuario.index');
+
+        // 2. Formulario de fecha/hora
+        Route::get('/reservar-espacio/tipo/{tipo}', [App\Http\Controllers\ReservaUsuarioController::class, 'create'])->name('reservas_usuario.create');
+
+        // 3. Comprobar disponibilidad y asignar
+        Route::post('/reservar-espacio/tipo/{tipo}/comprobar', [App\Http\Controllers\ReservaUsuarioController::class, 'comprobar'])->name('reservas_usuario.comprobar');
+
+        // 4. Guardar definitivo
+        Route::post('/reservar-espacio/guardar', [App\Http\Controllers\ReservaUsuarioController::class, 'store'])->name('reservas_usuario.store');
 
         // (Aquí meteremos luego las rutas para que el alumno reserve salas)
     });

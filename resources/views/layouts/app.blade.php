@@ -84,10 +84,10 @@
                         <a class="nav-link {{ request()->routeIs('catalogo.*') ? 'active' : '' }}" href="{{ route('catalogo.index') }}">Catálogo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('reservas.*') ? 'active' : '' }}" href="#">Salas</a>
+                        <a class="nav-link {{ request()->routeIs('reservas.*') ? 'active' : '' }}" href="{{ route('reservas_usuario.index') }}">Salas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}" href="#">Mis Préstamos</a>
+                        <a class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}" href="{{ route('perfil.index') }}">Mis Préstamos</a>
                     </li>
                 </ul>
 

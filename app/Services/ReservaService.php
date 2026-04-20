@@ -52,6 +52,51 @@ class ReservaService
         });
     }
 
+    public function buscarEspacioDisponible($tipoEspacioId, array $datos, $usuarioLogueadoId)
+    {
+        $userId = $datos['user_id'] ?? $usuarioLogueadoId;
+
+        // 1. REGLAS GENERALES (Filtramos al usuario y la fecha antes de mirar sillas)
+        $this->validarPermisoUsuario($userId, $usuarioLogueadoId);
+        $this->validarHoraNoPasada($datos['fecha'], $datos['hora_inicio']);
+        $this->validarAntelacionMinima($datos['fecha'], $datos['hora_inicio']);
+        $this->validarAntelacionMaxima($datos['fecha']);
+        $this->validarDuracion($datos['hora_inicio'], $datos['hora_fin']);
+        $this->validarSanciones($userId);
+        $this->validarLimiteReservas($userId);
+        $this->validarHorasDiarias($userId, $datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
+        $this->validarSolapamientoUsuario($userId, $datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
+        $this->validarHorarioSemanalJSON($datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
+        $this->validarFestivo($datos['fecha']);
+
+        // 2. BUSCAMOS LOS ESPACIOS FÍSICOS DE ESE TIPO
+        $espacios = Espacio::where('tipo_espacio_id', $tipoEspacioId)
+            ->where('disponible', 1)
+            ->get();
+
+        if ($espacios->isEmpty()) {
+            throw new Exception("Actualmente no hay espacios operativos de este tipo.");
+        }
+
+        // 3. EL SABUESO: Probamos uno por uno contra TUS reglas estrictas
+        foreach ($espacios as $espacio) {
+            try {
+                // Usamos tus propios métodos para comprobar buffer de limpieza y solapamientos
+                $this->validarBufferLimpieza($espacio->id, $datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
+                $this->validarDisponibilidadReal($espacio, $datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
+
+                // Si pasa tus dos escáneres sin tirar Exception... ¡ES EL ELEGIDO!
+                return $espacio;
+            } catch (Exception $e) {
+                // Si este espacio choca o necesita limpieza, ignoramos el error y probamos el siguiente
+                continue;
+            }
+        }
+
+        // 4. Si termina el bucle y no ha devuelto nada...
+        throw new Exception("No quedan espacios disponibles en el horario y fecha seleccionados.");
+    }
+
     // --- FUNCIONES PRIVADAS (Usando tu método Configuracion::get) ---
 
     private function validarHorarioSemanalJSON($fecha, $horaInicio, $horaFin)
@@ -85,14 +130,23 @@ class ReservaService
             throw new Exception("La biblioteca permanece cerrada los " . ucfirst($nombreDia) . "s.");
         }
 
-        // 3. Validamos horas (Cambiamos el formato por si el json dice "09:00" y la hora dice "09:00:00")
-        $horaInicioReserva = Carbon::parse($horaInicio)->format('H:i');
-        $horaFinReserva = Carbon::parse($horaFin)->format('H:i');
-        $apertura = Carbon::parse($horarioHoy['apertura'])->format('H:i');
-        $cierre = Carbon::parse($horarioHoy['cierre'])->format('H:i');
+        $toMinutos = function ($hora) {
+            $parsed = Carbon::parse($hora);
+            $minutos = $parsed->hour * 60 + $parsed->minute;
+            // "00:00" como cierre = fin del día = 1440 minutos
+            return $minutos === 0 ? 1440 : $minutos;
+        };
 
-        if ($horaInicioReserva < $apertura || $horaFinReserva > $cierre) {
-            throw new Exception("El horario de los " . ucfirst($nombreDia) . "s es de {$apertura} a {$cierre}.");
+        $inicioReserva = $toMinutos($horaInicio);
+        $finReserva    = $toMinutos($horaFin);
+        $apertura      = $toMinutos($horarioHoy['apertura']);
+        $cierre        = $toMinutos($horarioHoy['cierre']);
+
+        $aperturaStr = Carbon::parse($horarioHoy['apertura'])->format('H:i');
+        $cierreStr   = Carbon::parse($horarioHoy['cierre'])->format('H:i');
+
+        if ($inicioReserva < $apertura || $finReserva > $cierre) {
+            throw new Exception("El horario de los " . ucfirst($nombreDia) . "s es de {$aperturaStr} a {$cierreStr}.");
         }
     }
 

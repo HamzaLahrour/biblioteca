@@ -30,22 +30,20 @@ class StoreReservaRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            // Obligatorio, tiene que ser UUID, y la sala DEBE existir en la BD
-            'espacio_id'  => ['required', 'uuid', 'exists:espacios,id'],
-
-            // Obligatorio, debe ser fecha válida, y no puede ser en el pasado
+        // Reglas comunes para ambos pasos (Comprobar y Guardar)
+        $reglas = [
             'fecha'       => ['required', 'date', 'after_or_equal:today'],
-
-            // Obligatorio y con formato estricto de hora (ej: 09:30)
             'hora_inicio' => ['required', 'date_format:H:i'],
-
-            // Obligatorio, formato de hora, y estrictamente POSTERIOR a la hora de inicio
             'hora_fin'    => ['required', 'date_format:H:i', 'after:hora_inicio'],
-
-            // Opcional (solo lo mandará el admin), pero si lo manda, debe ser UUID y existir
             'user_id'     => ['nullable', 'uuid', 'exists:users,id'],
         ];
+
+        // Si estamos en el paso final de GUARDAR, entonces sí exigimos el espacio_id
+        if ($this->routeIs('reservas_usuario.store') || $this->routeIs('reservas.store')) {
+            $reglas['espacio_id'] = ['required', 'uuid', 'exists:espacios,id'];
+        }
+
+        return $reglas;
     }
 
     public function messages()
