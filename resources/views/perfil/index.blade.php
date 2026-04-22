@@ -1,46 +1,60 @@
 @extends('layouts.app')
 
-@section('title', 'Mi Espacio | BiblioTech')
+@section('title', 'Mi Espacio | LibreLah')
 
 @section('content')
 <div class="container py-5 mb-5">
 
-    <div class="row g-4">
+    {{-- CABECERA DE SECCIÓN --}}
+    <div class="mb-5">
+        <h2 class="fw-bold mb-1" style="color: var(--text-main); letter-spacing: -0.5px;">
+            Mi <span class="text-gradient">Espacio</span>
+        </h2>
+        <p class="text-muted">Gestiona tus lecturas, reservas y estado de tu cuenta.</p>
+    </div>
+
+    <div class="row g-4 g-xl-5">
         {{-- COLUMNA IZQUIERDA: EL CARNET Y SANCIONES --}}
         <div class="col-lg-4">
 
-            {{-- 🚨 ALERTA DE SANCIÓN (Solo aparece si está castigado) --}}
+            {{-- 🚨 ALERTA DE SANCIÓN --}}
             @if($sancionActiva)
-            <div class="alert alert-danger bg-danger bg-opacity-10 border-0 rounded-4 p-4 mb-4">
-                <div class="d-flex align-items-center mb-2">
-                    <i class="bi bi-exclamation-octagon-fill fs-4 text-danger me-2"></i>
-                    <h6 class="fw-bold text-danger mb-0">Cuenta Suspendida</h6>
+            <div class="alert custom-alert-danger d-flex align-items-start gap-3 shadow-sm mb-4" role="alert">
+                <i class="bi bi-shield-fill-exclamation fs-3 mt-1"></i>
+                <div>
+                    <h6 class="alert-heading fw-bold mb-1">Cuenta Suspendida</h6>
+                    <p class="mb-0 small" style="line-height: 1.4;">
+                        Tienes una sanción activa por "{{ $sancionActiva->motivo ?? 'retraso en devoluciones' }}".
+                        No podrás realizar préstamos ni reservas hasta el <strong>{{ \Carbon\Carbon::parse($sancionActiva->fecha_fin)->format('d/m/Y') }}</strong>.
+                    </p>
                 </div>
-                <p class="small text-danger-emphasis mb-0">
-                    Tienes una sanción activa por "{{ $sancionActiva->motivo ?? 'retraso en devoluciones' }}".
-                    No podrás realizar nuevos préstamos ni reservas hasta el <strong>{{ \Carbon\Carbon::parse($sancionActiva->fecha_fin)->format('d/m/Y') }}</strong>.
-                </p>
             </div>
             @endif
 
-            {{-- 🪪 CARNET DIGITAL --}}
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" style="background: linear-gradient(135deg, #111 0%, #333 100%); color: white;">
-                <div class="card-body p-4 position-relative">
-                    {{-- Marca de agua sutil --}}
-                    <i class="bi bi-book-half position-absolute opacity-10" style="font-size: 8rem; right: -20px; bottom: -20px;"></i>
+            {{-- 🪪 CARNET DIGITAL PREMIUM --}}
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 digital-card position-relative">
+                {{-- Efectos de fondo abstracto --}}
+                <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 150px; height: 150px; top: -50px; right: -50px;"></div>
+                <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 100px; height: 100px; bottom: -20px; left: -20px;"></div>
+                <i class="bi bi-fingerprint position-absolute opacity-10" style="font-size: 8rem; right: -10px; bottom: -10px; color: white;"></i>
 
+                <div class="card-body p-4 position-relative z-1 text-white">
                     <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div class="fw-bold text-uppercase" style="letter-spacing: 2px; font-size: 0.75rem; color: #aaa;">Lector Autorizado</div>
-                        <i class="bi bi-check-circle-fill {{ $sancionActiva ? 'text-danger' : 'text-success' }} fs-5"></i>
+                        <div class="fw-bold text-uppercase" style="letter-spacing: 2px; font-size: 0.75rem; color: rgba(255,255,255,0.7);">Lector Autorizado</div>
+                        <div class="status-badge {{ $sancionActiva ? 'bg-danger' : 'bg-success' }}">
+                            <i class="bi {{ $sancionActiva ? 'bi-x-circle-fill' : 'bi-check-circle-fill' }} me-1"></i>
+                            {{ $sancionActiva ? 'Inactivo' : 'Activo' }}
+                        </div>
                     </div>
 
-                    <h3 class="fw-bold mb-1">{{ $usuario->name }}</h3>
-                    <div class="text-white-50 small mb-4">{{ $usuario->email }}</div>
+                    <h3 class="fw-bold mb-1 text-truncate" title="{{ $usuario->name }}">{{ $usuario->name }}</h3>
+                    <div class="small mb-4 text-truncate" style="color: rgba(255,255,255,0.8);">{{ $usuario->email }}</div>
 
-                    <div class="p-3 rounded-3 mb-2 text-center" style="background-color: rgba(255,255,255,0.1);">
-                        <div class="font-monospace fw-bold fs-5" style="letter-spacing: 4px;">{{ $usuario->dni ?? 'SIN-DNI' }}</div>
+                    {{-- DNI con efecto Glassmorphism --}}
+                    <div class="p-3 rounded-3 mb-2 text-center glass-panel">
+                        <div class="font-monospace fw-bold fs-5" style="letter-spacing: 3px;">{{ $usuario->dni ?? 'SIN-DNI' }}</div>
                     </div>
-                    <div class="text-center font-monospace" style="font-size: 0.6rem; color: #888;">ID: {{ str_pad($usuario->id, 8, '0', STR_PAD_LEFT) }}</div>
+                    <div class="text-center font-monospace" style="font-size: 0.65rem; color: rgba(255,255,255,0.6);">ID: {{ str_pad($usuario->id, 8, '0', STR_PAD_LEFT) }}</div>
                 </div>
             </div>
 
@@ -51,46 +65,45 @@
 
             {{-- 📚 SECCIÓN: MIS PRÉSTAMOS ACTIVOS --}}
             <div class="d-flex justify-content-between align-items-end mb-3">
-                <h4 class="fw-bold text-dark mb-0">Mis Lecturas</h4>
-                <a href="{{ route('catalogo.index') }}" class="btn btn-sm btn-light border rounded-pill px-3">Explorar catálogo</a>
+                <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Mis Lecturas</h4>
+                <a href="{{ route('catalogo.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">Explorar</a>
             </div>
 
             @if($prestamos->count() > 0)
             <div class="row row-cols-1 g-3 mb-5">
                 @foreach($prestamos as $prestamo)
                 @php
-                // Usamos el nombre correcto de la BD para calcular los días
                 $vence = \Carbon\Carbon::parse($prestamo->fecha_devolucion_prevista);
                 $hoy = \Carbon\Carbon::today();
                 $diasRestantes = $hoy->diffInDays($vence, false);
                 @endphp
 
                 <div class="col">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 transition-all">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 float-card">
                         <div class="card-body p-3 d-flex align-items-center">
-                            {{-- Portada Miniatura --}}
-                            <div class="bg-light rounded-3 overflow-hidden me-3 flex-shrink-0 border" style="width: 60px; height: 85px;">
+                            {{-- Portada Miniatura (Mismo estilo que Catálogo) --}}
+                            <div class="bg-light rounded-3 overflow-hidden me-3 flex-shrink-0 book-thumb">
                                 @if($prestamo->libro->portada)
                                 <img src="{{ $prestamo->libro->portada }}" alt="Portada" style="width: 100%; height: 100%; object-fit: cover;">
                                 @else
-                                <div class="w-100 h-100 d-flex justify-content-center align-items-center text-muted"><i class="bi bi-book"></i></div>
+                                <div class="w-100 h-100 d-flex justify-content-center align-items-center text-muted" style="background-color: var(--bg-light);"><i class="bi bi-book text-primary opacity-50"></i></div>
                                 @endif
                             </div>
 
                             {{-- Datos del Libro --}}
-                            <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark text-truncate" style="max-width: 250px;">{{ $prestamo->libro->titulo }}</h6>
-                                <p class="text-muted small mb-2">{{ $prestamo->libro->autor }}</p>
+                            <div class="flex-grow-1 min-w-0">
+                                <h6 class="fw-bold mb-1 text-truncate" style="color: var(--secondary-dark);">{{ $prestamo->libro->titulo }}</h6>
+                                <p class="text-muted small mb-2 text-truncate">{{ $prestamo->libro->autor }}</p>
 
-                                {{-- Lógica visual de días restantes --}}
+                                {{-- Lógica visual de días restantes (Premium Tags) --}}
                                 @if($diasRestantes < 0)
-                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle"><i class="bi bi-exclamation-triangle-fill me-1"></i>¡Vencido hace {{ abs($diasRestantes) }} días!</span>
+                                    <span class="custom-tag tag-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>¡Vencido hace {{ abs($diasRestantes) }} días!</span>
                                     @elseif($diasRestantes == 0)
-                                    <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle"><i class="bi bi-clock-history me-1"></i>Devolver hoy</span>
+                                    <span class="custom-tag tag-warning"><i class="bi bi-clock-fill me-1"></i>Devolver hoy</span>
                                     @elseif($diasRestantes <= 2)
-                                        <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle"><i class="bi bi-clock-history me-1"></i>Devolver en {{ $diasRestantes }} días</span>
+                                        <span class="custom-tag tag-warning"><i class="bi bi-hourglass-split me-1"></i>Quedan {{ $diasRestantes }} días</span>
                                         @else
-                                        <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle"><i class="bi bi-calendar-check me-1"></i>Quedan {{ $diasRestantes }} días</span>
+                                        <span class="custom-tag tag-success"><i class="bi bi-calendar2-check-fill me-1"></i>Devolver en {{ $diasRestantes }} días</span>
                                         @endif
                             </div>
                         </div>
@@ -99,50 +112,61 @@
                 @endforeach
             </div>
             @else
-            <div class="bg-white border rounded-4 p-5 text-center mb-5 shadow-sm">
-                <div class="bg-light rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-book text-muted fs-4"></i>
+            {{-- Empty State Premium --}}
+            <div class="empty-state-card p-5 text-center mb-5">
+                <div class="empty-icon-wrapper mx-auto mb-3">
+                    <i class="bi bi-book"></i>
                 </div>
-                <h6 class="fw-bold text-dark">No tienes libros prestados</h6>
+                <h6 class="fw-bold" style="color: var(--secondary-dark);">No tienes libros en casa</h6>
                 <p class="text-muted small mb-0">Cuando te lleves un libro de la biblioteca, aparecerá aquí con su fecha de devolución.</p>
             </div>
             @endif
 
             {{-- 🛋️ SECCIÓN: MIS RESERVAS DE SALAS --}}
-            <h4 class="fw-bold text-dark mb-3 mt-4">Próximas Reservas</h4>
+            <div class="d-flex justify-content-between align-items-end mb-3 mt-4">
+                <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Próximas Reservas</h4>
+                <a href="{{ route('reservas_usuario.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">Reservar Sala</a>
+            </div>
 
             @if($reservas->count() > 0)
             <div class="row row-cols-1 g-3">
                 @foreach($reservas as $reserva)
                 <div class="col">
-                    <div class="card border border-light shadow-sm rounded-4 overflow-hidden">
+                    <div class="card border border-light shadow-sm rounded-4 overflow-hidden float-card">
                         <div class="card-body p-3 d-flex justify-content-between align-items-center">
+
                             <div class="d-flex align-items-center">
-                                <div class="bg-dark text-white rounded-3 d-flex flex-column justify-content-center align-items-center me-3" style="width: 55px; height: 55px;">
-                                    <span class="fs-5 fw-bold line-height-1">{{ \Carbon\Carbon::parse($reserva->fecha_reserva)->format('d') }}</span>
-                                    <span class="small text-uppercase" style="font-size: 0.65rem;">{{ \Carbon\Carbon::parse($reserva->fecha_reserva)->isoFormat('MMM') }}</span>
+                                {{-- Calendario Premium (Icon Box) --}}
+                                <div class="date-box me-3">
+                                    <span class="fs-5 fw-bold" style="line-height: 1;">{{ \Carbon\Carbon::parse($reserva->fecha_reserva)->format('d') }}</span>
+                                    <span class="small text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ \Carbon\Carbon::parse($reserva->fecha_reserva)->isoFormat('MMM') }}</span>
                                 </div>
+
                                 <div>
-                                    <h6 class="fw-bold mb-1">{{ $reserva->espacio->nombre ?? 'Sala' }}</h6>
-                                    <div class="text-muted small">
-                                        <i class="bi bi-clock me-1"></i> {{ \Carbon\Carbon::parse($reserva->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($reserva->hora_fin)->format('H:i') }}
+                                    <h6 class="fw-bold mb-1" style="color: var(--secondary-dark);">{{ $reserva->espacio->nombre ?? 'Sala' }}</h6>
+                                    <div class="text-muted small fw-medium">
+                                        <i class="bi bi-clock-fill me-1" style="color: var(--primary);"></i> {{ \Carbon\Carbon::parse($reserva->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($reserva->hora_fin)->format('H:i') }}
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- Botón para cancelar reserva --}}
-                            <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva?');">
+                            {{-- Botón para cancelar reserva (Ghost Danger) --}}
+                            <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva de sala?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Cancelar</button>
+                                <button type="submit" class="btn btn-sm btn-ghost-danger rounded-circle p-2" title="Cancelar reserva">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
                             </form>
+
                         </div>
                     </div>
                 </div>
                 @endforeach
             </div>
             @else
-            <div class="bg-white border rounded-4 p-4 text-center shadow-sm">
+            {{-- Empty State Premium --}}
+            <div class="empty-state-card p-4 text-center">
                 <p class="text-muted small mb-0">No tienes ninguna sala reservada para los próximos días.</p>
             </div>
             @endif
@@ -152,12 +176,162 @@
 </div>
 
 <style>
-    .transition-all {
+    /* VARIABLES LOCALES (ADN LibreLah) */
+    :root {
+        --primary: #1E90FF;
+        --secondary-dark: #0D47A1;
+        --secondary-light: #64B5F6;
+        --text-main: #212121;
+        --text-muted: #757575;
+        --bg-light: #F8F9FA;
+        --primary-soft: rgba(30, 144, 255, 0.1);
+        --danger-soft: rgba(239, 68, 68, 0.1);
+        --success-soft: rgba(34, 197, 94, 0.15);
+    }
+
+    /* TEXTO DEGRADADO */
+    .text-gradient {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+    }
+
+    /* ALERTA CUSTOM SANCIONES */
+    .custom-alert-danger {
+        background-color: var(--danger-soft);
+        color: #ef4444;
+        border: 1px dashed rgba(239, 68, 68, 0.3);
+        border-radius: 16px;
+    }
+
+    /* CARNET DIGITAL */
+    .digital-card {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-dark) 100%);
+        box-shadow: 0 10px 30px var(--primary-soft) !important;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* TARJETAS FLOTANTES (Préstamos y Reservas) */
+    .float-card {
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+    }
+
+    .float-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 25px var(--primary-soft) !important;
+    }
+
+    /* MINIATURAS DE LIBROS */
+    .book-thumb {
+        width: 60px;
+        height: 85px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* ETIQUETAS DE ESTADO (Custom Tags) */
+    .custom-tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .tag-danger {
+        background-color: var(--danger-soft);
+        color: #ef4444;
+    }
+
+    .tag-warning {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+    }
+
+    .tag-success {
+        background-color: var(--success-soft);
+        color: #16a34a;
+    }
+
+    /* FECHA RESERVAS (Icon Box) */
+    .date-box {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        background-color: var(--primary-soft);
+        color: var(--primary);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* BOTONES */
+    .btn-outline-primary {
+        color: var(--primary);
+        border: 2px solid var(--primary-soft);
+        background: transparent;
         transition: all 0.2s ease;
     }
 
-    .card.transition-all:hover {
-        transform: translateX(5px);
+    .btn-outline-primary:hover {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 4px 10px var(--primary-soft);
+    }
+
+    .btn-ghost-danger {
+        color: var(--text-muted);
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+
+    .btn-ghost-danger:hover {
+        background: var(--danger-soft);
+        color: #ef4444;
+    }
+
+    /* EMPTY STATES */
+    .empty-state-card {
+        border-radius: 24px;
+        background: #fff;
+        border: 1px dashed rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background: var(--primary-soft);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        color: var(--primary);
+        transform: rotate(-5deg);
+    }
+
+    /* Utilidad para truncar textos largos en tarjetas pequeñas */
+    .min-w-0 {
+        min-width: 0;
     }
 </style>
 @endsection

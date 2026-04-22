@@ -15,21 +15,36 @@
     {{-- Google Fonts: Inter --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        /* 🧬 NUESTRO ADN GLOBAL (Paleta Fase Gold) 🧬 */
         :root {
-            --bg-main: #fafafa;
-            --border-light: #f0f0f0;
-            --text-dark: #111111;
-            --text-muted: #737373;
+            --primary: #1E90FF;
+            /* Azul Dodger */
+            --secondary-dark: #0D47A1;
+            /* Azul Oscuro */
+            --secondary-light: #64B5F6;
+            /* Azul Claro */
+            --text-main: #212121;
+            /* Gris Oscuro */
+            --text-muted: #757575;
+            /* Gris Medio */
+            --bg-light: #F8F9FA;
+            /* Fondo App */
+
+            /* Utilidades translúcidas */
+            --primary-soft: rgba(30, 144, 255, 0.1);
+            --danger-soft: rgba(239, 68, 68, 0.1);
+            --success-main: #22c55e;
+            --success-soft: rgba(34, 197, 94, 0.15);
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-            font-weight: 400;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -39,24 +54,97 @@
             flex: 1;
         }
 
-        /* Navbar Minimalista */
+        /* 🧭 NAVBAR PREMIUM */
         .navbar-minimal {
-            background-color: #ffffff;
-            border-bottom: 1px solid var(--border-light);
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            /* Efecto cristal Apple */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
         }
 
         .nav-link {
             color: var(--text-muted) !important;
-            font-weight: 400;
-            transition: color 0.2s;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.2s ease;
+            position: relative;
         }
 
-        .nav-link:hover,
+        .nav-link:hover {
+            color: var(--secondary-dark) !important;
+        }
+
+        /* Indicador de sección activa con nuestro azul */
         .nav-link.active {
-            color: var(--text-dark) !important;
-            font-weight: 600;
+            color: var(--primary) !important;
+            font-weight: 700;
+        }
+
+        /* Línea sutil debajo del link activo en PC */
+        @media (min-width: 992px) {
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 2px;
+                background-color: var(--primary);
+                transition: width 0.3s ease;
+                border-radius: 2px;
+            }
+
+            .nav-link.active::after {
+                width: 80%;
+            }
+        }
+
+        /* 👤 AVATAR PREMIUM */
+        .avatar-wrapper {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary-dark));
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 8px var(--primary-soft);
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-toggle:hover .avatar-wrapper {
+            transform: scale(1.05);
+        }
+
+        /* Ocultar flecha por defecto del dropdown para más limpieza */
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        .dropdown-menu-custom {
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 0.5rem;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--bg-light);
+            color: var(--primary);
         }
     </style>
 </head>
@@ -69,17 +157,18 @@
 
             {{-- Logo --}}
             <a class="navbar-brand d-flex align-items-center" href="{{ route('catalogo.index') }}">
-                <img src="{{ asset('img/logolibrelah.png') }}" alt="Logo LibreLah" style="height: 28px;">
+                {{-- Si el logo tiene texto oscuro, destacará perfecto sobre el blanco --}}
+                <img src="{{ asset('img/logolibrelah.png') }}" alt="Logo LibreLah" style="height: 32px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             </a>
 
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAlumno">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler border-0 shadow-none text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAlumno">
+                <i class="bi bi-list fs-1"></i>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarAlumno">
 
-                {{-- Enlaces Centrados Visualmente --}}
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3">
+                {{-- Enlaces Centrados con Indicadores Activos --}}
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-2 mt-3 mt-lg-0 text-center text-lg-start">
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('catalogo.*') ? 'active' : '' }}" href="{{ route('catalogo.index') }}">Catálogo</a>
                     </li>
@@ -87,35 +176,52 @@
                         <a class="nav-link {{ request()->routeIs('reservas.*') ? 'active' : '' }}" href="{{ route('reservas_usuario.index') }}">Salas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}" href="{{ route('perfil.index') }}">Mis Préstamos</a>
+                        <a class="nav-link {{ request()->routeIs('perfil.*') ? 'active' : '' }}" href="{{ route('perfil.index') }}">Mi Espacio</a>
                     </li>
                 </ul>
 
-                {{-- Avatar y Dropdown (Asumimos que siempre está logueado) --}}
-                <div class="d-flex align-items-center mt-3 mt-lg-0">
+                {{-- Avatar y Dropdown Inyectados con ADN --}}
+                <div class="d-flex justify-content-center mt-3 mt-lg-0 pb-3 pb-lg-0">
                     <div class="dropdown">
-                        <a class="text-decoration-none dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             @php
-                            // Si por algún motivo falla, ponemos "US" de fallback
                             $nombre = Auth::check() ? Auth::user()->name : 'Usuario';
-                            $iniciales = substr($nombre, 0, 2);
+                            $palabras = explode(' ', $nombre);
+                            $iniciales = count($palabras) > 1
+                            ? substr($palabras[0], 0, 1) . substr($palabras[1], 0, 1)
+                            : substr($nombre, 0, 2);
                             @endphp
-                            <div class="bg-dark text-white rounded-circle d-flex justify-content-center align-items-center fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
+
+                            <div class="avatar-wrapper">
                                 {{ strtoupper($iniciales) }}
                             </div>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border border-light mt-2 rounded-3">
-                            <li>
-                                <h6 class="dropdown-header text-muted fw-normal">Mi Cuenta</h6>
+
+                        {{-- Dropdown Premium (Mini Tarjeta) --}}
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom mt-2 p-3" style="width: 250px;">
+                            {{-- Info del Usuario --}}
+                            <li class="mb-3 text-center">
+                                <div class="avatar-wrapper mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                    {{ strtoupper($iniciales) }}
+                                </div>
+                                <h6 class="fw-bold mb-0 text-truncate" style="color: var(--secondary-dark);">{{ Auth::user()->name ?? 'Lector' }}</h6>
+                                <span class="text-muted small text-truncate d-block">{{ Auth::user()->email ?? 'usuario@email.com' }}</span>
                             </li>
-                            <li><a class="dropdown-item" href="{{ route('perfil.index') }}">Mi Perfil</a></li>
+
                             <li>
-                                <hr class="dropdown-divider">
+                                <hr class="dropdown-divider opacity-10 mb-2">
                             </li>
+
+                            {{-- (Opcional) Si en el futuro tienes una vista para cambiar contraseña o foto, iría aquí --}}
+                            {{-- <li><a class="dropdown-item py-2 fw-medium rounded-3" href="#"><i class="bi bi-gear me-2"></i> Ajustes de cuenta</a></li> --}}
+
+                            {{-- Botón de Salir --}}
                             <li>
                                 <form action="{{ route('usuarios.logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
+                                    <button type="submit" class="dropdown-item py-2 text-danger fw-bold rounded-3 d-flex align-items-center justify-content-center mt-1" style="background-color: var(--danger-soft);">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                    </button>
                                 </form>
                             </li>
                         </ul>

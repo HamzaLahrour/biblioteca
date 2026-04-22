@@ -52,4 +52,68 @@ class StoreLibroRequest extends FormRequest
             'categoria_id.exists'     => 'La categoría seleccionada no es válida.',
         ];
     }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $isbn = $this->input('isbn');
+
+            // Si está vacío, no hacemos nada (ya que en tus rules es nullable)
+            if (empty($isbn)) {
+                return;
+            }
+
+            // 1. Limpiamos espacios y guiones para quedarnos solo con los caracteres
+            $cleanIsbn = str_replace(['-', ' '], '', strtoupper($isbn));
+            $length = strlen($cleanIsbn);
+
+            // 2. Evaluamos si es de 10 o 13 caracteres
+            if ($length === 10) {
+                if (!$this->isValidIsbn10($cleanIsbn)) {
+                    $validator->errors()->add('isbn', 'El ISBN-10 ingresado no es matemáticamente válido.');
+                }
+            } elseif ($length === 13) {
+                if (!$this->isValidIsbn13($cleanIsbn)) {
+                    $validator->errors()->add('isbn', 'El ISBN-13 ingresado no es matemáticamente válido.');
+                }
+            } else {
+                $validator->errors()->add('isbn', 'El ISBN debe tener exactamente 10 o 13 caracteres válidos (sin contar guiones).');
+            }
+        });
+    }
+
+    private function isValidIsbn10(string $isbn): bool
+    {
+        // Validamos que sean 9 números seguidos de un número o una 'X'
+        if (!preg_match('/^\d{9}[\dX]$/', $isbn)) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 9; $i++) {
+            $sum += (int)$isbn[$i] * (10 - $i);
+        }
+
+        $last = $isbn[9];
+        $sum += ($last === 'X') ? 10 : (int)$last;
+
+        return $sum % 11 === 0;
+    }
+
+    private function isValidIsbn13(string $isbn): bool
+    {
+        // Validamos que sean exactamente 13 números
+        if (!preg_match('/^\d{13}$/', $isbn)) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 13; $i++) {
+            // Alterna multiplicando por 1 y por 3
+            $multiplier = ($i % 2 === 0) ? 1 : 3;
+            $sum += (int)$isbn[$i] * $multiplier;
+        }
+
+        return $sum % 10 === 0;
+    }
 }

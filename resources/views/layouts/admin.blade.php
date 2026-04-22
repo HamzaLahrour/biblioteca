@@ -23,6 +23,11 @@
             /* Gris Medio */
             --bg-light: #F5F5F5;
             /* Gris Claro */
+
+            --color-exito: #4CAF50;
+            --color-alerta: #FF9800;
+            --color-error: #F44336;
+            --color-info: #2196F3;
         }
 
         body {
@@ -210,21 +215,41 @@
                     </div>
                 </header>
 
+                {{-- ALERTAS SEMAFÓRICAS --}}
+
+                {{-- 🟢 VERDE: Éxito y confirmaciones --}}
                 @if(session('success'))
-                <div class="alert alert-dismissible fade show border-0 text-white" style="background-color: var(--secondary-light);" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-exito);" role="alert">
+                    <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+                    <div>{{ session('success') }}</div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 @endif
 
+                {{-- 🔵 AZUL: Información general y mensajes neutros --}}
                 @if(session('info'))
-                <div class="alert alert-info">{{ session('info') }}</div>
+                <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-info);" role="alert">
+                    <i class="bi bi-info-circle-fill fs-5 me-2"></i>
+                    <div>{{ session('info') }}</div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
                 @endif
 
-                @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show border-0" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {{-- 🟠 NARANJA: Avisos y advertencias --}}
+                @if(session('warning'))
+                <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-alerta);" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                    <div>{{ session('warning') }}</div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                @endif
+
+                {{-- 🔴 ROJO: Errores y bloqueos --}}
+                @if(session('error') || session('danger'))
+                <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-error);" role="alert">
+                    <i class="bi bi-x-octagon-fill fs-5 me-2"></i>
+                    <div>{{ session('error') ?? session('danger') }}</div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 @endif
 

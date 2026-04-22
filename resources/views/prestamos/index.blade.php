@@ -182,7 +182,7 @@
 
                             {{-- ACCIONES (Desplegable 2026) --}}
                             <td class="py-3 text-end">
-                                <div class="dropdown">
+                                <div class="dropdown dropstart">
                                     <button
                                         class="btn btn-light btn-sm rounded-circle border"
                                         type="button"

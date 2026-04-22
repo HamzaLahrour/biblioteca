@@ -161,7 +161,7 @@
                             Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary px-4 shadow-sm" style="font-weight: 500;">
-                            <i class="bi bi-save me-1"></i> Guardar Espacio
+                            <i class="bi bi-save me-1"></i> Guardar Libro
                         </button>
                     </div>
                 </form>
