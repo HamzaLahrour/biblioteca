@@ -27,19 +27,47 @@ class ReservaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $usuario = auth()->user();
+        // Iniciamos la consulta cargando las relaciones para no saturar la BD
+        $query = Reserva::with(['user', 'espacio']);
 
-        // Si es admin, ve TODAS las reservas. Si es alumno, solo las suyas.
-        if ($usuario->rol === 'admin') {
-            // Usamos 'with' para evitar el problema de N+1 consultas (Optimización)
-            $reservas = Reserva::with(['user', 'espacio'])->orderBy('fecha_reserva', 'desc')->paginate(10);
-        } else {
-            $reservas = $usuario->reservas()->with('espacio')->orderBy('fecha_reserva', 'desc')->paginate(10);
+        // 1. Filtrar por Estado
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
         }
 
-        return view('reservas.index', compact('reservas'));
+        // 2. Filtrar por Espacio
+        if ($request->filled('espacio_id')) {
+            $query->where('espacio_id', $request->espacio_id);
+        }
+
+        // 3. Filtrar por Rango de Fechas
+        if ($request->filled('fecha_inicio')) {
+            $query->whereDate('fecha_reserva', '>=', $request->fecha_inicio);
+        }
+        if ($request->filled('fecha_fin')) {
+            $query->whereDate('fecha_reserva', '<=', $request->fecha_fin);
+        }
+
+        // 4. Filtrar por Usuario (Buscador por nombre o email)
+        if ($request->filled('buscar_usuario')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->buscar_usuario . '%')
+                    ->orWhere('email', 'like', '%' . $request->buscar_usuario . '%');
+            });
+        }
+
+        // Ordenamos por fecha más reciente y paginamos (conservando los filtros en la URL)
+        $reservas = $query->orderBy('fecha_reserva', 'desc')
+            ->orderBy('hora_inicio', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        // Mandamos los espacios para rellenar el `<select>` del filtro
+        $espacios = Espacio::orderBy('nombre')->get();
+
+        return view('reservas.index', compact('reservas', 'espacios'));
     }
 
     /**
@@ -72,7 +100,7 @@ class ReservaController extends Controller
 
             // 3. Si el Chef no grita, todo ha ido bien. El mesero sirve la respuesta feliz.
             return redirect()->route('reservas.index')
-                ->with('success', '¡Reserva confirmada con éxito para el día ' . \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y') . '!');
+                ->with('success', '¡Reserva confirmada con éxito para el día ' . \Carbon\Carbon::parse($reserva->fecha_reserva)->format('d/m/Y') . '!');
         } catch (Exception $e) {
             // 4. ¡EL CHEF HA GRITADO! (Ej: "¡Es festivo!" o "¡Aforo completo!")
             // El mesero atrapa el error y devuelve al usuario al formulario amablemente
@@ -114,7 +142,7 @@ class ReservaController extends Controller
         }
 
         // 2. Control de listillos: No puedes cancelar una reserva que ya pasó
-        if (\Carbon\Carbon::parse($reserva->fecha . ' ' . $reserva->hora_inicio)->isPast()) {
+        if (\Carbon\Carbon::parse($reserva->fecha_reserva . ' ' . $reserva->hora_inicio)->isPast()) {
             return back()->withErrors(['error_general' => 'No puedes cancelar una reserva que ya ha comenzado o pasado.']);
         }
 

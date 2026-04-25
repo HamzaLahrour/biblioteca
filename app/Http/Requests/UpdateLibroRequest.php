@@ -23,13 +23,13 @@ class UpdateLibroRequest extends FormRequest
     public function rules(): array
     {
 
-        $libro=$this->route('libro')->id;
-        
+        $libro = $this->route('libro')->id;
+
         return [
             'titulo'           => 'required|string|max:255',
             'autor'            => 'required|string|max:255',
             // El ISBN es opcional, pero si lo ponen, debe ser único en la tabla libros
-            'isbn'             => 'nullable|string|max:255|unique:libros,isbn'. $libro,
+            'isbn'             => 'nullable|string|max:255|unique:libros,isbn,' . $libro,
             'editorial'        => 'nullable|string|max:255',
             // Validamos que el año sea lógico (hasta el año actual)
             'anio_publicacion' => 'nullable|integer|min:1000|max:' . date('Y'),

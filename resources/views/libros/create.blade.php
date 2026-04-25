@@ -157,7 +157,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                        <a href="{{ route('espacios.index') }}" class="btn btn-light px-4" style="font-weight: 500;">
+                        <a href="{{ route('libros.index') }}" class="btn btn-light px-4" style="font-weight: 500;">
                             Cancelar
                         </a>
                         <button type="submit" class="btn btn-primary px-4 shadow-sm" style="font-weight: 500;">

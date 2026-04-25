@@ -88,7 +88,7 @@
                             </div>
                         </div>
                         <ul class="list-unstyled text-muted small mt-3">
-                            <li><strong>ISBN:</strong> <span class="font-monospace ms-1">{{ $prestamo->libro->isbn ?? '---' }}</span></li>
+                            <li><strong>ISBN:</strong> <span class="font-monospace ms-1">{{ $prestamo->libro->isbn ?? 'Sin ISBN' }}</span></li>
                         </ul>
                     </div>
                 </div>
@@ -108,15 +108,15 @@
                         <div class="col-sm-4 border-start border-end border-secondary border-opacity-25">
                             <div class="text-muted small mb-1">Vencimiento Previsto</div>
                             <div class="fw-bold fs-5 text-dark font-monospace">
-                                {{ \Carbon\Carbon::parse($prestamo->fecha_vencimiento)->format('d/m/Y') }}
+                                {{ \Carbon\Carbon::parse($prestamo->fecha_devolucion_prevista)->format('d/m/Y') }}
                             </div>
                         </div>
 
                         <div class="col-sm-4">
                             <div class="text-muted small mb-1">Devolución Real</div>
                             <div class="fw-bold fs-5 font-monospace {{ $prestamo->fecha_devolucion ? 'text-success' : 'text-muted' }}">
-                                @if($prestamo->fecha_devolucion)
-                                {{ \Carbon\Carbon::parse($prestamo->fecha_devolucion)->format('d/m/Y') }}
+                                @if($prestamo->fecha_devolucion_real)
+                                {{ \Carbon\Carbon::parse($prestamo->fecha_devolucion_real)->format('d/m/Y') }}
                                 @else
                                 <span class="fst-italic">Pendiente</span>
                                 @endif

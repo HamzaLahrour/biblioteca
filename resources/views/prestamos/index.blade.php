@@ -20,25 +20,7 @@
         </div>
     </div>
 
-    {{-- ALERTAS DEL SISTEMA (Éxito, Error, Peligro por pérdida) --}}
-    @if(session('success'))
-    <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center mb-4">
-        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
-        <div>{{ session('success') }}</div>
-    </div>
-    @endif
-    @if(session('warning'))
-    <div class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center mb-4">
-        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-        <div>{{ session('warning') }}</div>
-    </div>
-    @endif
-    @if(session('danger'))
-    <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center mb-4">
-        <i class="bi bi-x-octagon-fill fs-4 me-3"></i>
-        <div>{{ session('danger') }}</div>
-    </div>
-    @endif
+
 
     {{-- FILTROS RÁPIDOS --}}
     {{-- BARRA DE HERRAMIENTAS AVANZADA --}}
@@ -129,7 +111,7 @@
                                         {{ strtoupper(substr($prestamo->user->nombre ?? 'U', 0, 1)) }}
                                     </div>
                                     <div>
-                                        <span class="d-block fw-bold text-dark">{{ $prestamo->user->nombre ?? 'Usuario Eliminado' }}</span>
+                                        <span class="d-block fw-bold text-dark">{{ $prestamo->user->name ?? 'Usuario Eliminado' }}</span>
                                         <span class="d-block small" style="color: var(--text-muted);">{{ $prestamo->user->email ?? 'N/A' }}</span>
                                     </div>
                                 </div>

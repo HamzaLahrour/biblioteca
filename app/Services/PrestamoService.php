@@ -132,6 +132,12 @@ class PrestamoService
 
             $this->generarSancionPorPerdida($prestamo);
 
+            $libro = $prestamo->libro;
+
+            if ($libro && $libro->copias_totales > 0) {
+                $libro->decrement('copias_totales');
+            }
+
             return $prestamo;
         });
     }

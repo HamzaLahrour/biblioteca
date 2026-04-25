@@ -23,7 +23,13 @@ class StoreCategoriaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => ['required', 'string', 'max:255', 'unique:categorias,nombre'],
+            'nombre' => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+                'regex:/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/'
+            ],
             'descripcion' => ['nullable', 'string'],
         ];
     }
@@ -31,8 +37,12 @@ class StoreCategoriaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nombre.required' => 'El nombre de la categoría es obligatorio.',
-            'nombre.unique' => 'Ya existe una categoría con este nombre.',
+            'nombre.required'     => 'El nombre de la categoría es obligatorio.',
+            'nombre.string'       => 'El nombre debe ser texto.',
+            'nombre.min'          => 'El nombre debe tener al menos 3 caracteres.',
+            'nombre.max'          => 'El nombre no puede superar los 100 caracteres.',
+            'nombre.regex'        => 'El nombre debe contener al menos una letra, no puede ser solo números.',
+            'nombre.unique'       => 'Ya existe una categoría con este nombre.',
         ];
     }
 }

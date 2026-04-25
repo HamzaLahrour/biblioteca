@@ -23,7 +23,7 @@ class StoreUsuarioRequest extends FormRequest
             'password'         => 'required|string|min:8',
             'dni'              => 'required|string|max:20|unique:users,dni',
             'fecha_nacimiento' => 'required|date|before:today',
-            'telefono'         => 'nullable|string|max:15',
+            'telefono' => ['required', 'regex:/^[6789][0-9]{8}$/'],
 
         ];
     }
@@ -40,6 +40,7 @@ class StoreUsuarioRequest extends FormRequest
             'dni.unique'                => 'Este DNI ya pertenece a otro usuario.',
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.before'   => 'La fecha de nacimiento no puede ser futura.',
+            'telefono.regex' => 'El número de teléfono debe ser válido en España (9 dígitos empezando por 6, 7, 8 o 9).',
 
         ];
     }

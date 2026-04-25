@@ -105,7 +105,7 @@ class ReservaService
 
         if (!$horarioJson) return;
 
-        // 1. BLINDAJE: Si Laravel ya lo hizo array, no lo decodificamos otra vez
+        // Comprobar si el valor ya es un array (por el casting del modelo)
         $horarioSemanal = is_string($horarioJson) ? json_decode($horarioJson, true) : $horarioJson;
 
         $fechaParseada = Carbon::parse($fecha);
@@ -123,17 +123,18 @@ class ReservaService
         $nombreDia = $mapaDias[$fechaParseada->dayOfWeekIso];
         $horarioHoy = $horarioSemanal[$nombreDia] ?? null;
 
-        // 2. BLINDAJE: filter_var entiende '1', 'true', o true como Válido.
+        // Validar que el día existe en la config y está marcado como abierto
         $estaAbierto = $horarioHoy && filter_var($horarioHoy['abierto'], FILTER_VALIDATE_BOOLEAN);
 
         if (!$estaAbierto) {
             throw new Exception("La biblioteca permanece cerrada los " . ucfirst($nombreDia) . "s.");
         }
 
+        // Función para convertir la hora en minutos transcurridos desde medianoche
         $toMinutos = function ($hora) {
             $parsed = Carbon::parse($hora);
             $minutos = $parsed->hour * 60 + $parsed->minute;
-            // "00:00" como cierre = fin del día = 1440 minutos
+            // Si es "00:00" se asume que es el final del día (1440 min)
             return $minutos === 0 ? 1440 : $minutos;
         };
 
@@ -145,8 +146,22 @@ class ReservaService
         $aperturaStr = Carbon::parse($horarioHoy['apertura'])->format('H:i');
         $cierreStr   = Carbon::parse($horarioHoy['cierre'])->format('H:i');
 
+        // 1. Validar que la reserva esté dentro del horario de apertura general
         if ($inicioReserva < $apertura || $finReserva > $cierre) {
             throw new Exception("El horario de los " . ucfirst($nombreDia) . "s es de {$aperturaStr} a {$cierreStr}.");
+        }
+
+        // 2. Aplicar margen de desalojo antes del cierre (ej: 15 minutos)
+        $margenDesalojo = 15;
+        $cierrePermitido = $cierre - $margenDesalojo;
+
+        if ($finReserva > $cierrePermitido) {
+            // Formatear los minutos de vuelta a H:i para el mensaje de error
+            $horas = str_pad(floor($cierrePermitido / 60), 2, '0', STR_PAD_LEFT);
+            $minutos = str_pad($cierrePermitido % 60, 2, '0', STR_PAD_LEFT);
+            $horaMaxima = "{$horas}:{$minutos}";
+
+            throw new Exception("Las reservas deben terminar como máximo a las {$horaMaxima} para permitir el desalojo de la sala.");
         }
     }
 
@@ -195,7 +210,17 @@ class ReservaService
     private function validarLimiteReservas($userId)
     {
         $maximaReserva = Configuracion::get('max_reservas_activas', 2);
-        $reservasActivas = Reserva::where('user_id', $userId)->where('estado', 'activa')->count();
+
+        $reservasActivas = Reserva::where('user_id', $userId)
+            ->where('estado', 'activa')
+            ->where(function ($query) {              // ← Solo las que aún no han pasado
+                $query->where('fecha_reserva', '>', now()->toDateString())
+                    ->orWhere(function ($q) {
+                        $q->where('fecha_reserva', now()->toDateString())
+                            ->where('hora_fin', '>', now()->format('H:i:s'));
+                    });
+            })
+            ->count();
 
         if ($reservasActivas >= $maximaReserva) {
             throw new Exception("Has superado el límite de {$maximaReserva} reservas activas.");

@@ -23,21 +23,27 @@ class StoreTipoEspacioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => 'required|string|max:255|unique:tipo_espacios,nombre',
-            'descripcion' => 'nullable|string|max:1000',
+            'nombre' => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+                'regex:/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/',
+                'unique:tipo_espacios',
+            ],
+            'descripcion' => ['nullable', 'string'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'nombre.required' => 'El nombre del tipo de espacio es obligatorio.',
-            'nombre.string' => 'El nombre debe ser un texto válido.',
-            'nombre.max' => 'El nombre no puede superar los 255 caracteres.',
-            'nombre.unique' => 'Este tipo de espacio ya existe en la biblioteca. Elige otro nombre.',
-            
-            'descripcion.string' => 'La descripción debe ser un texto válido.',
-            'descripcion.max' => 'La descripción es demasiado larga (máximo 1000 caracteres).',
+            'nombre.required'     => 'El nombre del Tipo de Espacio es obligatorio.',
+            'nombre.string'       => 'El nombre debe ser texto.',
+            'nombre.min'          => 'El nombre debe tener al menos 3 caracteres.',
+            'nombre.max'          => 'El nombre no puede superar los 100 caracteres.',
+            'nombre.regex'        => 'El nombre debe contener al menos una letra, no puede ser solo números.',
+            'nombre.unique'       => 'Ya existe un Tipo de Espacio con este nombre.',
         ];
     }
 }

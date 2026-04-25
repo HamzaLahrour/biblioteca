@@ -217,7 +217,7 @@
 
                 {{-- ALERTAS SEMAFÓRICAS --}}
 
-                {{-- 🟢 VERDE: Éxito y confirmaciones --}}
+                {{--VERDE:Éxito y confirmaciones --}}
                 @if(session('success'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-exito);" role="alert">
                     <i class="bi bi-check-circle-fill fs-5 me-2"></i>
@@ -226,7 +226,7 @@
                 </div>
                 @endif
 
-                {{-- 🔵 AZUL: Información general y mensajes neutros --}}
+                {{--AZUL: Información general y mensajes neutros --}}
                 @if(session('info'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-info);" role="alert">
                     <i class="bi bi-info-circle-fill fs-5 me-2"></i>
@@ -235,7 +235,7 @@
                 </div>
                 @endif
 
-                {{-- 🟠 NARANJA: Avisos y advertencias --}}
+                {{--NARANJA: Avisos y advertencias --}}
                 @if(session('warning'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-alerta);" role="alert">
                     <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
@@ -244,7 +244,7 @@
                 </div>
                 @endif
 
-                {{-- 🔴 ROJO: Errores y bloqueos --}}
+                {{--ROJO: Errores y bloqueos --}}
                 @if(session('error') || session('danger'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-error);" role="alert">
                     <i class="bi bi-x-octagon-fill fs-5 me-2"></i>
