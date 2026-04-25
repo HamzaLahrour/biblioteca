@@ -26,13 +26,24 @@ class ReservaUsuarioController extends Controller
             $query->where('disponible', 1);
         }])->orderBy('nombre')->get();
 
+
+
         // Carga la vista desde la NUEVA carpeta
         return view('reservas_usuario.index', compact('tipos'));
     }
 
     public function create(TipoEspacio $tipo)
     {
-        return view('reservas_usuario.create', compact('tipo'));
+
+        $reservasHoy = \App\Models\Reserva::whereHas('espacio', function ($q) use ($tipo) {
+            $q->where('tipo_espacio_id', $tipo->id);
+        })
+            ->whereDate('fecha_reserva', \Carbon\Carbon::today())
+            ->where('estado', 'activa')
+            ->orderBy('hora_inicio', 'asc')
+            ->get(['hora_inicio', 'hora_fin']);
+
+        return view('reservas_usuario.create', compact('tipo', 'reservasHoy'));
     }
 
     public function comprobar(StoreReservaRequest $request, TipoEspacio $tipo)

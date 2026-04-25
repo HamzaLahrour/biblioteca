@@ -146,6 +146,26 @@
             background-color: var(--bg-light);
             color: var(--primary);
         }
+
+        .custom-alert-danger {
+            background-color: rgba(239, 68, 68, 0.08);
+            /* Fondo rojo muy suave */
+            color: #ef4444;
+            /* Texto rojo intenso */
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            /* Borde sólido ultra sutil, NADA de punteados */
+            border-radius: 16px;
+        }
+
+        .custom-alert-success {
+            background-color: rgba(16, 185, 129, 0.08);
+            /* Fondo verde muy suave */
+            color: #10b981;
+            /* Texto verde intenso */
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            /* Borde sólido ultra sutil */
+            border-radius: 16px;
+        }
     </style>
 </head>
 
@@ -234,6 +254,39 @@
 
     {{-- 📦 CONTENIDO PRINCIPAL --}}
     <main>
+        {{-- Envolvemos las alertas en un container para que NO se estiren --}}
+        <div class="container mt-4">
+
+            @if(session('success'))
+            <div class="alert custom-alert-success alert-dismissible fade show d-flex align-items-start gap-3 shadow-sm mb-4 position-relative pe-5" role="alert">
+                <i class="bi bi-check-circle-fill fs-5 mt-1"></i>
+                <div>
+                    <h6 class="alert-heading fw-bold mb-1">¡Completado!</h6>
+                    <p class="mb-0 small">{{ session('success') }}</p>
+                </div>
+                <button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-3" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.8rem;"></button>
+            </div>
+            @endif
+
+            {{-- Alerta de Error --}}
+            @if($errors->any())
+            <div class="alert custom-alert-danger alert-dismissible fade show d-flex align-items-start gap-3 shadow-sm mb-4 position-relative pe-5" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
+                <div>
+                    <h6 class="alert-heading fw-bold mb-1">Revisa los datos</h6>
+                    <ul class="mb-0 small ps-3">
+                        @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                <button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-3" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.8rem;"></button>
+            </div>
+            @endif
+
+        </div>
+
+        {{-- Aquí se inyecta el contenido de tus vistas --}}
         @yield('content')
     </main>
 

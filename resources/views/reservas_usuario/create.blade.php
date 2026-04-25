@@ -22,18 +22,7 @@
                 <p class="text-muted mt-2">Dinos fecha y hora para buscarte el mejor hueco.</p>
             </div>
 
-            {{-- Alerta Customizada --}}
-            @if($errors->any())
-            <div class="alert custom-alert-danger d-flex align-items-start gap-3 shadow-sm mb-4" role="alert">
-                <i class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
-                <div>
-                    <h6 class="alert-heading fw-bold mb-1">Revisa los datos</h6>
-                    <ul class="mb-0 small ps-3">
-                        @foreach($errors->all() as $error) <li>{{ $error }}</li> @endforeach
-                    </ul>
-                </div>
-            </div>
-            @endif
+
 
             {{-- Tarjeta de Formulario Premium --}}
             <form action="{{ route('reservas_usuario.comprobar', $tipo->id) }}" method="POST" class="booking-form p-4 p-md-5">
@@ -65,6 +54,36 @@
                     Buscar hueco libre <i class="bi bi-arrow-right"></i>
                 </button>
             </form>
+
+            <div class="accordion mt-4 shadow-sm rounded-4 border-0" id="accordionHorarios">
+                <div class="accordion-item border-0 rounded-4 overflow-hidden">
+                    <h2 class="accordion-header" id="headingHorarios">
+                        <button class="accordion-button collapsed py-3 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHorarios" aria-expanded="false" aria-controls="collapseHorarios" style="background-color: var(--bg-light); color: var(--secondary-dark); font-size: 0.9rem;">
+                            <i class="bi bi-clock-history me-2" style="color: var(--primary);"></i> Consultar horarios ocupados de hoy
+                        </button>
+                    </h2>
+                    <div id="collapseHorarios" class="accordion-collapse collapse" aria-labelledby="headingHorarios" data-bs-parent="#accordionHorarios">
+                        <div class="accordion-body border-top" style="border-color: rgba(0,0,0,0.05) !important;">
+
+                            @if(isset($reservasHoy) && $reservasHoy->count() > 0)
+                            <p class="text-muted small mb-3">Evita solapar tu reserva con estos tramos:</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach($reservasHoy as $reserva)
+                                <span class="badge bg-white text-danger border border-danger-subtle px-3 py-2 rounded-pill shadow-sm" style="font-weight: 600;">
+                                    {{ \Carbon\Carbon::parse($reserva->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($reserva->hora_fin)->format('H:i') }}
+                                </span>
+                                @endforeach
+                            </div>
+                            @else
+                            <div class="text-success small fw-bold d-flex align-items-center">
+                                <i class="bi bi-stars fs-5 me-2"></i> ¡Todo libre por ahora! Tienes vía libre para elegir.
+                            </div>
+                            @endif
+
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -157,14 +176,6 @@
         background-color: var(--secondary-dark);
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(13, 71, 161, 0.4);
-    }
-
-    /* ALERTA ERROR */
-    .custom-alert-danger {
-        background-color: var(--danger-soft);
-        color: #ef4444;
-        border: 1px dashed rgba(239, 68, 68, 0.3);
-        border-radius: 16px;
     }
 </style>
 @endsection

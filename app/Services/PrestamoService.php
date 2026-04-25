@@ -352,8 +352,18 @@ class PrestamoService
 
     private function validarPuedeRenovar(Prestamo $prestamo): void
     {
+
+        $hoy = Carbon::today();
+        $vence = Carbon::parse($prestamo->fecha_devolucion_prevista)->startOfDay();
+
         if (Carbon::today()->gt(Carbon::parse($prestamo->fecha_devolucion_prevista))) {
             throw new Exception('Acción denegada: No puedes renovar un préstamo que ya ha vencido. Debes devolver el libro.');
+        }
+
+        $diasRestantes = $hoy->diffInDays($vence, false);
+
+        if ($diasRestantes > 3) {
+            throw new Exception("Acción denegada: Solo puedes renovar el libro cuando queden 3 días o menos para la fecha límite.");
         }
     }
 

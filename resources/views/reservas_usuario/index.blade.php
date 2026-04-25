@@ -51,10 +51,10 @@
                         <div class="status-indicator justify-content-center mb-4">
                             @if($tipo->espacios_count > 0)
                             <span class="status-dot available"></span>
-                            <span class="status-text">{{ $tipo->espacios_count }} espacios disponibles</span>
+                            <span class="status-text fw-bold">Disponible</span>
                             @else
                             <span class="status-dot unavailable"></span>
-                            <span class="status-text text-muted">Agotado actualmente</span>
+                            <span class="status-text text-muted fw-bold">En mantenimiento</span>
                             @endif
                         </div>
 
@@ -65,7 +65,7 @@
                         </a>
                         @else
                         <button disabled class="btn btn-light border-0 w-100 rounded-pill py-2 fw-semibold" style="color: var(--text-muted); background-color: var(--bg-light);">
-                            No disponible
+                            Temporalmente cerrado
                         </button>
                         @endif
                     </div>

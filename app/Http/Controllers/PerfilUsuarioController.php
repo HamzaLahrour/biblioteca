@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Services\PrestamoService;
+use App\Models\Prestamo;
 
 class PerfilUsuarioController extends Controller
 {
@@ -34,5 +36,16 @@ class PerfilUsuarioController extends Controller
             ->first();
 
         return view('perfil.index', compact('usuario', 'prestamos', 'reservas', 'sancionActiva'));
+    }
+
+    public function renovar(Prestamo $prestamo, PrestamoService $prestamoService)
+    {
+        try {
+            $prestamoService->renovarPrestamo($prestamo, Auth::id());
+
+            return back()->with('success', 'Préstamo renovado correctamente. ¡Disfruta la lectura!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error_general' => $e->getMessage()]);
+        }
     }
 }

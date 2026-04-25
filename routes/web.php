@@ -32,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Cerrar sesión (Común para Administradores y Usuarios)
     Route::post('/usuarios/logout', [UserController::class, 'logout'])->name('usuarios.logout');
+    Route::delete('/reservas/{reserva}', [ReservaController::class, 'destroy'])->name('reservas.destroy');
 
 
     // ==========================================
@@ -55,7 +56,9 @@ Route::middleware(['auth'])->group(function () {
         // 4. Guardar definitivo
         Route::post('/reservar-espacio/guardar', [App\Http\Controllers\ReservaUsuarioController::class, 'store'])->name('reservas_usuario.store');
 
+        Route::post('/perfil/prestamos/{prestamo}/renovar', [App\Http\Controllers\PerfilUsuarioController::class, 'renovar'])->name('perfil.prestamos.renovar');
         // (Aquí meteremos luego las rutas para que el alumno reserve salas)
+
     });
 
 
@@ -87,7 +90,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/admin/festivos/{id}', [FestivoController::class, 'destroy'])->name('festivos.destroy');
 
         // Gestión de Reservas (Admin)
-        Route::resource('reservas', ReservaController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+        Route::resource('reservas', ReservaController::class)->only(['index', 'create', 'store', 'show',]);
 
         // Gestión de Préstamos (Admin)
         Route::resource('prestamos', PrestamoController::class)->except(['edit', 'update', 'destroy']);

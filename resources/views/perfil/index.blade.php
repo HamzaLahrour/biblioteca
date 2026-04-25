@@ -81,21 +81,25 @@
                 <div class="col">
                     <div class="card border-0 shadow-sm rounded-4 h-100 float-card">
                         <div class="card-body p-3 d-flex align-items-center">
-                            {{-- Portada Miniatura (Mismo estilo que Catálogo) --}}
                             <div class="bg-light rounded-3 overflow-hidden me-3 flex-shrink-0 book-thumb">
                                 @if($prestamo->libro->portada)
                                 <img src="{{ $prestamo->libro->portada }}" alt="Portada" style="width: 100%; height: 100%; object-fit: cover;">
                                 @else
-                                <div class="w-100 h-100 d-flex justify-content-center align-items-center text-muted" style="background-color: var(--bg-light);"><i class="bi bi-book text-primary opacity-50"></i></div>
+                                <div class="w-100 h-100 d-flex justify-content-center align-items-center text-muted" style="background-color: var(--bg-light);">
+                                    <i class="bi bi-book text-primary opacity-50"></i>
+                                </div>
                                 @endif
                             </div>
 
-                            {{-- Datos del Libro --}}
                             <div class="flex-grow-1 min-w-0">
                                 <h6 class="fw-bold mb-1 text-truncate" style="color: var(--secondary-dark);">{{ $prestamo->libro->titulo }}</h6>
-                                <p class="text-muted small mb-2 text-truncate">{{ $prestamo->libro->autor }}</p>
+                                <p class="text-muted small mb-1 text-truncate">{{ $prestamo->libro->autor }}</p>
 
-                                {{-- Lógica visual de días restantes (Premium Tags) --}}
+                                {{-- Fecha: ahora en gris, sin competir con el título --}}
+                                <div class="small text-muted mb-2" style="font-size: 0.78rem;">
+                                    <i class="bi bi-calendar2 me-1"></i> {{ $vence->format('d/m/Y') }}
+                                </div>
+
                                 @if($diasRestantes < 0)
                                     <span class="custom-tag tag-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>¡Vencido hace {{ abs($diasRestantes) }} días!</span>
                                     @elseif($diasRestantes == 0)
@@ -105,74 +109,136 @@
                                         @else
                                         <span class="custom-tag tag-success"><i class="bi bi-calendar2-check-fill me-1"></i>Devolver en {{ $diasRestantes }} días</span>
                                         @endif
+
+                                        <div class="mt-2">
+                                            {{-- PRIORIDAD 1: ¿Ha alcanzado el límite dinámico de la base de datos? --}}
+                                            @if($prestamo->renovaciones >= App\Models\Configuracion::get('max_renovaciones', 2))
+                                            <div class="d-flex align-items-center text-danger fw-bold" style="font-size: 0.75rem;">
+                                                <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                                                Límite de renovaciones alcanzado
+                                            </div>
+
+                                            {{-- PRIORIDAD 2: ¿El préstamo ya ha vencido? --}}
+                                            @elseif($diasRestantes < 0)
+                                                <div class="text-muted" style="font-size: 0.75rem;">
+                                                <i class="bi bi-info-circle me-2"></i> Préstamo vencido, contacta con la biblioteca
+                                        </div>
+
+                                        {{-- PRIORIDAD 3: ¿Estamos en la ventana de los últimos 3 días? --}}
+                                        @elseif($diasRestantes <= 3)
+                                            <form action="{{ route('perfil.prestamos.renovar', $prestamo->id) }}" method="POST" onsubmit="return confirm('¿Quieres solicitar una ampliación para este libro?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" style="font-size: 0.75rem;">
+                                                <i class="bi bi-arrow-clockwise me-1"></i> Renovar ahora
+                                            </button>
+                                            </form>
+
+                                            {{-- PRIORIDAD 4: Si no es nada de lo anterior, es demasiado pronto --}}
+                                            @else
+                                            <span class="text-muted" style="font-size: 0.7rem;">
+                                                <i class="bi bi-calendar-event me-1"></i>
+                                                Podrás renovar a partir del {{ $vence->copy()->subDays(3)->format('d/m/Y') }}
+                                            </span>
+                                            @endif
                             </div>
                         </div>
                     </div>
                 </div>
-                @endforeach
             </div>
-            @else
-            {{-- Empty State Premium --}}
-            <div class="empty-state-card p-5 text-center mb-5">
-                <div class="empty-icon-wrapper mx-auto mb-3">
-                    <i class="bi bi-book"></i>
-                </div>
-                <h6 class="fw-bold" style="color: var(--secondary-dark);">No tienes libros en casa</h6>
-                <p class="text-muted small mb-0">Cuando te lleves un libro de la biblioteca, aparecerá aquí con su fecha de devolución.</p>
+            @endforeach
+        </div>
+        @else
+        {{-- Empty State Premium --}}
+        <div class="empty-state-card p-5 text-center mb-5">
+            <div class="empty-icon-wrapper mx-auto mb-3">
+                <i class="bi bi-book"></i>
             </div>
-            @endif
+            <h6 class="fw-bold" style="color: var(--secondary-dark);">No tienes libros en casa</h6>
+            <p class="text-muted small mb-0">Cuando te lleves un libro de la biblioteca, aparecerá aquí con su fecha de devolución.</p>
+        </div>
+        @endif
 
-            {{-- 🛋️ SECCIÓN: MIS RESERVAS DE SALAS --}}
-            <div class="d-flex justify-content-between align-items-end mb-3 mt-4">
-                <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Próximas Reservas</h4>
+        {{-- 🛋️ SECCIÓN: MIS RESERVAS DE SALAS --}}
+        <div class="d-flex justify-content-between align-items-end mb-3 mt-4">
+            <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Próximas Reservas</h4>
+            <div>
+                {{-- Este botón lo programarás mañana cuando estés fresco --}}
+                <a href="#" class="btn btn-sm btn-link text-muted text-decoration-none me-2 fw-bold" style="font-size: 0.85rem;">Ver historial</a>
                 <a href="{{ route('reservas_usuario.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">Reservar Sala</a>
             </div>
+        </div>
 
-            @if($reservas->count() > 0)
-            <div class="row row-cols-1 g-3">
-                @foreach($reservas as $reserva)
-                <div class="col">
-                    <div class="card border border-light shadow-sm rounded-4 overflow-hidden float-card">
-                        <div class="card-body p-3 d-flex justify-content-between align-items-center">
+        @if($reservas->count() > 0)
+        <div class="row row-cols-1 g-3">
+            @foreach($reservas as $reserva)
+            @php
+            $fechaSolo = \Carbon\Carbon::parse($reserva->fecha_reserva)->format('Y-m-d');
+            $inicio = \Carbon\Carbon::parse($fechaSolo . ' ' . $reserva->hora_inicio);
+            $fin = \Carbon\Carbon::parse($fechaSolo . ' ' . $reserva->hora_fin);
+            $ahora = \Carbon\Carbon::now();
 
-                            <div class="d-flex align-items-center">
-                                {{-- Calendario Premium (Icon Box) --}}
-                                <div class="date-box me-3">
-                                    <span class="fs-5 fw-bold" style="line-height: 1;">{{ \Carbon\Carbon::parse($reserva->fecha_reserva)->format('d') }}</span>
-                                    <span class="small text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ \Carbon\Carbon::parse($reserva->fecha_reserva)->isoFormat('MMM') }}</span>
-                                </div>
+            $yaPaso = $ahora->gt($fin);
+            $enCurso = $ahora->between($inicio, $fin);
+            $minutosParaInicio = $ahora->diffInMinutes($inicio, false);
 
-                                <div>
-                                    <h6 class="fw-bold mb-1" style="color: var(--secondary-dark);">{{ $reserva->espacio->nombre ?? 'Sala' }}</h6>
-                                    <div class="text-muted small fw-medium">
-                                        <i class="bi bi-clock-fill me-1" style="color: var(--primary);"></i> {{ \Carbon\Carbon::parse($reserva->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($reserva->hora_fin)->format('H:i') }}
-                                    </div>
-                                </div>
+            // Regla: Cancelable si no ha pasado, no está en curso y faltan >= 30 min
+            $puedeCancelar = !$yaPaso && !$enCurso && ($minutosParaInicio >= 30);
+            @endphp
+
+            {{-- Oculta la tarjeta si ya pasó o está cancelada --}}
+            @if(!$yaPaso && $reserva->estado !== 'cancelada')
+            <div class="col">
+                <div class="card border border-light shadow-sm rounded-4 overflow-hidden float-card">
+                    <div class="card-body p-3 d-flex justify-content-between align-items-center">
+
+                        <div class="d-flex align-items-center">
+                            {{-- Fecha Icon Box --}}
+                            <div class="date-box me-3">
+                                <span class="fs-5 fw-bold" style="line-height: 1;">{{ $inicio->format('d') }}</span>
+                                <span class="small text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ $inicio->isoFormat('MMM') }}</span>
                             </div>
 
-                            {{-- Botón para cancelar reserva (Ghost Danger) --}}
-                            <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva de sala?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-ghost-danger rounded-circle p-2" title="Cancelar reserva">
-                                    <i class="bi bi-trash3-fill"></i>
-                                </button>
-                            </form>
-
+                            {{-- Información Limpia --}}
+                            <div>
+                                <h6 class="fw-bold mb-1" style="color: var(--secondary-dark);">{{ $reserva->espacio->nombre ?? 'Sala' }}</h6>
+                                <div class="text-muted small fw-medium">
+                                    <i class="bi bi-clock-fill me-1" style="color: var(--primary);"></i>
+                                    {{ $inicio->format('H:i') }} - {{ $fin->format('H:i') }}
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- BOTONERA INVISIBLE (Solo acciones) --}}
+                        @if($puedeCancelar)
+                        <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva de sala?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-ghost-danger rounded-circle p-2" title="Cancelar reserva">
+                                <i class="bi bi-trash3-fill fs-5"></i>
+                            </button>
+                        </form>
+                        @elseif(!$enCurso)
+                        {{-- Candado sutil (margen de 30 min superado) --}}
+                        <button type="button" class="btn btn-sm text-muted rounded-circle p-2 border-0" title="Demasiado tarde para cancelar" style="background: transparent; cursor: not-allowed;">
+                            <i class="bi bi-lock-fill fs-5 opacity-50"></i>
+                        </button>
+                        @endif
+
                     </div>
                 </div>
-                @endforeach
-            </div>
-            @else
-            {{-- Empty State Premium --}}
-            <div class="empty-state-card p-4 text-center">
-                <p class="text-muted small mb-0">No tienes ninguna sala reservada para los próximos días.</p>
             </div>
             @endif
-
+            @endforeach
         </div>
+        @else
+        {{-- Empty State Premium --}}
+        <div class="empty-state-card p-4 text-center">
+            <p class="text-muted small mb-0">No tienes ninguna sala reservada para los próximos días.</p>
+        </div>
+        @endif
+
     </div>
+</div>
 </div>
 
 <style>

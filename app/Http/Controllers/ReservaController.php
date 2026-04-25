@@ -10,6 +10,7 @@ use App\Services\ReservaService;
 use App\Models\Reserva;
 use App\Models\Espacio;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 use Exception;
 
@@ -136,20 +137,17 @@ class ReservaController extends Controller
      */
     public function destroy(Reserva $reserva)
     {
-        // 1. Barrera de seguridad: ¡Nada de cancelar la reserva del vecino!
-        if (auth()->id() !== $reserva->user_id && auth()->user()->rol !== 'admin') {
-            abort(403, 'Acceso denegado: No puedes cancelar reservas de otra persona.');
+
+        // Valida que si no eres dueño de la reserva ni admin no puedes cancelar 
+        if (Auth::user()->rol !== 'admin' && Auth::user()->id !== $reserva->user_id) {
+            return redirect()->back()->with('error', 'No tienes permiso para cancelar esta reserva.');
         }
 
-        // 2. Control de listillos: No puedes cancelar una reserva que ya pasó
-        if (\Carbon\Carbon::parse($reserva->fecha_reserva . ' ' . $reserva->hora_inicio)->isPast()) {
-            return back()->withErrors(['error_general' => 'No puedes cancelar una reserva que ya ha comenzado o pasado.']);
-        }
 
-        // 3. Cancelamos (liberamos el espacio mágicamente para todos los demás)
-        $reserva->update(['estado' => 'cancelada']);
 
-        return redirect()->route('reservas.index')
-            ->with('success', 'Tu reserva ha sido cancelada. El espacio vuelve a estar libre.');
+        // 3. LA EJECUCIÓN
+        $reserva->delete();
+
+        return redirect()->back()->with('success', 'Reserva cancelada correctamente.');
     }
 }
