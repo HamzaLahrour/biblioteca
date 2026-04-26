@@ -73,9 +73,7 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     Route::middleware(['can:es_admin'])->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('layouts.admin');
-        })->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/generar-password', function () {
             return response()->json(['password' => \Illuminate\Support\Str::password(8, letters: true, numbers: true, symbols: true)]);

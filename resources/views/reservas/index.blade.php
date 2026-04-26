@@ -4,20 +4,6 @@
 
 @section('content')
 
-{{-- Alertas de Éxito o Error --}}
-@if(session('success'))
-<div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3" role="alert">
-    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-@endif
-
-@error('error_general')
-<div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3" role="alert">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-@enderror
 
 {{-- 🔍 PANEL DE FILTROS --}}
 <div class="card border-0 shadow-sm rounded-4 mb-4">

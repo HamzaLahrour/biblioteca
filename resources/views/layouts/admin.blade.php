@@ -114,7 +114,7 @@
 
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a href="#" class="nav-link active">
+                            <a href="{{ route('dashboard')}}" class="nav-link active">
                                 <i class="bi bi-grid-1x2"></i> Panel de Control
                             </a>
                         </li>
@@ -167,12 +167,7 @@
                             </a>
                         </li>
 
-                        <h6 class="sidebar-heading">E. Estadísticas</h6>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="bi bi-bar-chart-line"></i> Informes de Uso
-                            </a>
-                        </li>
+
 
                         <h6 class="sidebar-heading">F. Ajustes</h6>
                         <li class="nav-item">

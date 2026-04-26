@@ -131,17 +131,22 @@ class ReservaService
         }
 
         // Función para convertir la hora en minutos transcurridos desde medianoche
-        $toMinutos = function ($hora) {
+        $toMinutos = function ($hora, $esCierre = false) {
             $parsed = Carbon::parse($hora);
             $minutos = $parsed->hour * 60 + $parsed->minute;
-            // Si es "00:00" se asume que es el final del día (1440 min)
-            return $minutos === 0 ? 1440 : $minutos;
+
+            // SOLO si es una hora de cierre/fin y marca "00:00", asumimos que es el final del día (1440 min)
+            if ($esCierre && $minutos === 0) {
+                return 1440;
+            }
+            return $minutos;
         };
 
+        // Pasamos 'true' solo a las variables que representan un final/cierre
         $inicioReserva = $toMinutos($horaInicio);
-        $finReserva    = $toMinutos($horaFin);
+        $finReserva    = $toMinutos($horaFin, true);
         $apertura      = $toMinutos($horarioHoy['apertura']);
-        $cierre        = $toMinutos($horarioHoy['cierre']);
+        $cierre        = $toMinutos($horarioHoy['cierre'], true);
 
         $aperturaStr = Carbon::parse($horarioHoy['apertura'])->format('H:i');
         $cierreStr   = Carbon::parse($horarioHoy['cierre'])->format('H:i');
