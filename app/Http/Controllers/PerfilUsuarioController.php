@@ -48,4 +48,17 @@ class PerfilUsuarioController extends Controller
             return back()->withErrors(['error_general' => $e->getMessage()]);
         }
     }
+
+    public function historialReservas()
+    {
+        // Traemos TODAS las reservas del usuario, ordenadas de la más nueva a la más antigua
+        $reservas = \App\Models\Reserva::with('espacio')
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->orderBy('fecha_reserva', 'desc')
+            ->orderBy('hora_inicio', 'desc')
+            ->paginate(10);
+
+        // Asegúrate de que la carpeta de la vista coincida con donde la vayas a crear
+        return view('perfil.historial_reservas', compact('reservas'));
+    }
 }

@@ -15,7 +15,7 @@ class TipoEspacioController extends Controller
      */
     public function index()
     {
-         $tipoEspacios=TipoEspacio::orderBy('nombre')->paginate(10);
+        $tipoEspacios = TipoEspacio::orderBy('nombre')->paginate(10);
         return view('tipo_espacios.index', compact('tipoEspacios'));
     }
 
@@ -25,7 +25,6 @@ class TipoEspacioController extends Controller
     public function create()
     {
         return view('tipo_espacios.create');
-
     }
 
     /**
@@ -34,8 +33,7 @@ class TipoEspacioController extends Controller
     public function store(StoreTipoEspacioRequest $request)
     {
         TipoEspacio::create($request->validated());
-        return redirect()->route('tipos_espacios.index')->with('succes','Tipo de Espacio creado con éxito');
-
+        return redirect()->route('tipos_espacios.index')->with('succes', 'Tipo de Espacio creado con éxito');
     }
 
     /**
@@ -43,7 +41,7 @@ class TipoEspacioController extends Controller
      */
     public function show(TipoEspacio $tipoEspacio)
     {
-        $tipoEspacio->load('espacios'); 
+        $tipoEspacio->load('espacios');
         return view('tipo_espacios.show', compact('tipoEspacio'));
     }
 
@@ -52,8 +50,7 @@ class TipoEspacioController extends Controller
      */
     public function edit(TipoEspacio $tipoEspacio)
     {
-        return view('tipo_espacios.edit',compact('tipoEspacio'));
-
+        return view('tipo_espacios.edit', compact('tipoEspacio'));
     }
 
     /**
@@ -61,11 +58,11 @@ class TipoEspacioController extends Controller
      */
     public function update(UpdateTipoEspacioRequest $request, TipoEspacio $tipoEspacio)
     {
-         $tipoEspacio->fill($request->validated());
+        $tipoEspacio->fill($request->validated());
 
         if (!$tipoEspacio->isDirty()) {
             return redirect()->route('tipos_espacios.index')
-            ->with('info', 'No realizaste ningún cambio.');
+                ->with('info', 'No realizaste ningún cambio.');
         }
 
         $tipoEspacio->save();
@@ -81,12 +78,12 @@ class TipoEspacioController extends Controller
     {
         if ($tipoEspacio->espacios()->count() > 0) {
             return redirect()->route('tipos_espacios.index')
-                             ->with('error', 'No puedes borrar un Tipo de Espacio que contenga espacios.');
+                ->with('error', 'No puedes borrar un Tipo de Espacio que contenga espacios.');
         }
 
         $tipoEspacio->delete();
 
         return redirect()->route('tipos_espacios.index')
-                         ->with('success', 'Tipo Espacio eliminado con éxito.');
+            ->with('success', 'Tipo Espacio eliminado con éxito.');
     }
 }

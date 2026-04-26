@@ -68,4 +68,11 @@ class CatalogoController extends Controller
             'categoriasEscaparate'
         ));
     }
+
+    public function show(\App\Models\Libro $libro)
+    {
+        $libro->load('categoria');
+
+        return view('catalogo.show', compact('libro'));
+    }
 }

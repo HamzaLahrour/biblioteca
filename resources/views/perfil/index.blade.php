@@ -158,12 +158,11 @@
         </div>
         @endif
 
-        {{-- 🛋️ SECCIÓN: MIS RESERVAS DE SALAS --}}
+        {{-- SECCIÓN: MIS RESERVAS DE SALAS --}}
         <div class="d-flex justify-content-between align-items-end mb-3 mt-4">
             <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Próximas Reservas</h4>
             <div>
-                {{-- Este botón lo programarás mañana cuando estés fresco --}}
-                <a href="#" class="btn btn-sm btn-link text-muted text-decoration-none me-2 fw-bold" style="font-size: 0.85rem;">Ver historial</a>
+                <a href="{{ route('perfil.reservas.historial') }}" class="btn btn-sm btn-link text-muted text-decoration-none me-2 fw-bold" style="font-size: 0.85rem;">Ver historial</a>
                 <a href="{{ route('reservas_usuario.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">Reservar Sala</a>
             </div>
         </div>

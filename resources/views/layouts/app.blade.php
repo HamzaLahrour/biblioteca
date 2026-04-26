@@ -65,17 +65,26 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
         }
 
+        .header-flotante {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+            z-index: 1050;
+        }
+
+        /* --- INICIO DE CAMBIOS DE ANIMACIÓN EXACTOS --- */
         .nav-link {
             color: var(--text-muted) !important;
             font-weight: 500;
             font-size: 0.95rem;
             padding: 0.5rem 1rem !important;
-            transition: all 0.2s ease;
+            transition: color 0.3s ease;
+            /* Transición suave de color */
             position: relative;
         }
 
         .nav-link:hover {
-            color: var(--secondary-dark) !important;
+            color: var(--primary) !important;
+            /* Azul principal al pasar el ratón */
         }
 
         /* Indicador de sección activa con nuestro azul */
@@ -84,25 +93,33 @@
             font-weight: 700;
         }
 
-        /* Línea sutil debajo del link activo en PC */
-        @media (min-width: 992px) {
-            .nav-link::after {
-                content: '';
-                position: absolute;
-                bottom: -2px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 0;
-                height: 2px;
-                background-color: var(--primary);
-                transition: width 0.3s ease;
-                border-radius: 2px;
-            }
-
-            .nav-link.active::after {
-                width: 80%;
-            }
+        /* LA LÍNEA DE ANIMACIÓN */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: 4px;
+            /* Pegado debajo de las letras */
+            left: 50%;
+            background-color: var(--primary);
+            border-radius: 5px;
+            transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: translateX(-50%);
         }
+
+        /* Crece solo al hacer hover (al 60% para que no pise el margen invisible de Bootstrap) */
+        .nav-link:hover::after {
+            width: 60%;
+        }
+
+        /* Si está en esa página, NO muestra la línea, solo el color azul */
+        .nav-link.active::after {
+            display: none !important;
+        }
+
+        /* --- FIN DE CAMBIOS DE ANIMACIÓN --- */
+
 
         /* 👤 AVATAR PREMIUM */
         .avatar-wrapper {
@@ -166,19 +183,28 @@
             /* Borde sólido ultra sutil */
             border-radius: 16px;
         }
+
+        @media (max-width: 991px) {
+            .mobile-dropdown-center {
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 
 <body>
 
     {{-- 🧭 NAVEGACIÓN SUPERIOR --}}
-    <nav class="navbar navbar-expand-lg navbar-minimal sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-minimal sticky-top header-flotante">
         <div class="container">
 
             {{-- Logo --}}
             <a class="navbar-brand d-flex align-items-center" href="{{ route('catalogo.index') }}">
                 {{-- Si el logo tiene texto oscuro, destacará perfecto sobre el blanco --}}
-                <img src="{{ asset('img/logolibrelah.png') }}" alt="Logo LibreLah" style="height: 32px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <img src="{{ asset('img/logolibrelah.png') }}" alt="Logo LibreLah" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             </a>
 
             <button class="navbar-toggler border-0 shadow-none text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAlumno">
@@ -201,29 +227,24 @@
                 </ul>
 
                 {{-- Avatar y Dropdown Inyectados con ADN --}}
-                <div class="d-flex justify-content-center mt-3 mt-lg-0 pb-3 pb-lg-0">
+                <div class="mt-3 mt-lg-0 ms-lg-3 d-flex justify-content-center align-items-center">
                     <div class="dropdown">
-                        <a class="text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @php
-                            $nombre = Auth::check() ? Auth::user()->name : 'Usuario';
-                            $palabras = explode(' ', $nombre);
-                            $iniciales = count($palabras) > 1
-                            ? substr($palabras[0], 0, 1) . substr($palabras[1], 0, 1)
-                            : substr($nombre, 0, 2);
-                            @endphp
 
-                            <div class="avatar-wrapper">
-                                {{ strtoupper($iniciales) }}
-                            </div>
+                        {{-- EL BOTÓN (Avatar pequeño) --}}
+                        <a class="text-decoration-none dropdown-toggle d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <x-user-avatar :user="Auth::user()" size="40px" fontSize="14px" />
                         </a>
 
-                        {{-- Dropdown Premium (Mini Tarjeta) --}}
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-custom mt-2 p-3" style="width: 250px;">
+                        {{-- EL MENÚ DESPLEGABLE (Alineado a la derecha en PC, centrado en móvil por CSS) --}}
+                        <ul class="dropdown-menu dropdown-menu-end mt-2 p-3 border-0 shadow-lg mobile-dropdown-center" style="width: 260px;">
                             {{-- Info del Usuario --}}
                             <li class="mb-3 text-center">
-                                <div class="avatar-wrapper mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.2rem;">
-                                    {{ strtoupper($iniciales) }}
+
+                                {{-- Avatar interior centrado --}}
+                                <div class="d-flex justify-content-center w-100 mb-2">
+                                    <x-user-avatar :user="Auth::user()" size="56px" fontSize="20px" />
                                 </div>
+
                                 <h6 class="fw-bold mb-0 text-truncate" style="color: var(--secondary-dark);">{{ Auth::user()->name ?? 'Lector' }}</h6>
                                 <span class="text-muted small text-truncate d-block">{{ Auth::user()->email ?? 'usuario@email.com' }}</span>
                             </li>
@@ -232,14 +253,11 @@
                                 <hr class="dropdown-divider opacity-10 mb-2">
                             </li>
 
-                            {{-- (Opcional) Si en el futuro tienes una vista para cambiar contraseña o foto, iría aquí --}}
-                            {{-- <li><a class="dropdown-item py-2 fw-medium rounded-3" href="#"><i class="bi bi-gear me-2"></i> Ajustes de cuenta</a></li> --}}
-
                             {{-- Botón de Salir --}}
                             <li>
                                 <form action="{{ route('usuarios.logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="dropdown-item py-2 text-danger fw-bold rounded-3 d-flex align-items-center justify-content-center mt-1" style="background-color: var(--danger-soft);">
+                                    <button type="submit" class="dropdown-item py-2 text-danger fw-bold rounded-3 d-flex align-items-center justify-content-center mt-1 transition-all" style="background-color: var(--danger-soft);">
                                         <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
                                     </button>
                                 </form>

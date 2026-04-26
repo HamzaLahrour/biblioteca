@@ -16,7 +16,10 @@ use App\Http\Controllers\PerfilUsuarioController;
 // ==========================================
 // 1. ZONA PÚBLICA (Sin loguear)
 // ==========================================
-Route::get('/', [CatalogoController::class, 'index'])->name('catalogo.index');
+
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 Route::prefix('usuarios')->group(function () {
     Route::get('/login', [UserController::class, 'login'])->name('login');
@@ -40,6 +43,8 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     Route::middleware(['can:es_usuario'])->group(function () {
 
+        Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
+
         // Espacio del Alumno
         Route::get('/mi-espacio', [PerfilUsuarioController::class, 'index'])->name('perfil.index');
 
@@ -58,7 +63,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/perfil/prestamos/{prestamo}/renovar', [App\Http\Controllers\PerfilUsuarioController::class, 'renovar'])->name('perfil.prestamos.renovar');
         // (Aquí meteremos luego las rutas para que el alumno reserve salas)
-
+        Route::get('/mi-espacio/historial-reservas', [App\Http\Controllers\PerfilUsuarioController::class, 'historialReservas'])->name('perfil.reservas.historial');
+        Route::get('/catalogo/{libro}', [CatalogoController::class, 'show'])->name('catalogo.show');
     });
 
 

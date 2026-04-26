@@ -7,7 +7,7 @@ $disponibles = $libro->copias_totales - $prestados;
 @endphp
 
 
-<a href="{{ route('libros.show', $libro->id ?? 1) }}" class="text-decoration-none d-block h-100">
+<a href="{{ route('catalogo.show', $libro->id) }}" class="text-decoration-none d-block h-100">
     <div class="card h-100 book-card border-0 shadow-sm-hover">
         <div class="book-cover-container position-relative skeleton-bg">
             @if($libro->portada)
