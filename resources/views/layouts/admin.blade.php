@@ -144,11 +144,6 @@
                                 <i class="bi bi-arrow-left-right"></i> Gestion de Prestamos
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="bi bi-clock-history"></i> Historial de Devoluciones
-                            </a>
-                        </li>
 
                         <h6 class="sidebar-heading">D. Espacios</h6>
                         <li class="nav-item">
@@ -173,6 +168,12 @@
                         <li class="nav-item">
                             <a href="{{ route('configuracion.edit') }}" class="nav-link {{ request()->routeIs('configuracion.*') ? 'active bg-primary-subtle text-primary fw-bold rounded' : '' }}">
                                 <i class="bi bi-gear-fill me-2"></i> Configuración General
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('festivos.index') }}" class="nav-link {{ request()->routeIs('festivos.*') ? 'active' : '' }}">
+                                <i class="bi bi-calendar-x"></i> Días Festivos
                             </a>
                         </li>
 

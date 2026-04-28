@@ -103,5 +103,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/renovar', [PrestamoController::class, 'renovar'])->name('renovar');
             Route::post('/perdido', [PrestamoController::class, 'perdido'])->name('perdido');
         });
+
+        Route::resource('festivos', App\Http\Controllers\FestivoController::class)->only(['index', 'store', 'destroy']);
     });
 });
