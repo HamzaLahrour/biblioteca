@@ -21,7 +21,12 @@ class Libro extends Model
         return $this->hasMany(Prestamo::class);
     }
 
-    
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class)->latest();
+    }
+
+
 
 
     public function getDisponiblesAttribute()

@@ -310,6 +310,24 @@
 
     {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Seleccionamos todos los avisos
+            const alertas = document.querySelectorAll('.alert');
+
+            alertas.forEach(alerta => {
+                // Esperamos 4 segundos (4000 ms) antes de actuar
+                setTimeout(() => {
+                    alerta.style.transition = 'opacity 0.5s ease, margin 0.5s ease, height 0.5s ease';
+                    alerta.style.opacity = '0';
+
+                    // Esperamos medio segundo más para que termine la animación y lo borramos del HTML
+                    setTimeout(() => alerta.remove(), 500);
+                }, 4000);
+            });
+        });
+    </script>
 </body>
 
 </html>

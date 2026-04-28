@@ -33,13 +33,10 @@ class LibroController extends Controller
             $q->where('categoria_id', $categoria);
         });
 
-        // 3. Filtro de Estado (Si implementamos la columna 'estado')
-        $query->when(request('estado'), function ($q, $estado) {
-            $q->where('estado', $estado);
-        });
+
 
         // Ordenamos alfabéticamente por defecto
-        $libros = $query->orderBy('titulo', 'asc')->paginate(15);
+        $libros = $query->orderBy('titulo', 'asc')->paginate(10);
 
         // Traemos las categorías para llenar el desplegable del filtro
         $categorias = \App\Models\Categoria::orderBy('nombre')->get();

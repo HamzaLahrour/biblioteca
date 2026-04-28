@@ -90,4 +90,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Prestamo::class);
     }
+
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class);
+    }
 }

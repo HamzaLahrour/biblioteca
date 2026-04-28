@@ -37,6 +37,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/usuarios/logout', [UserController::class, 'logout'])->name('usuarios.logout');
     Route::delete('/reservas/{reserva}', [ReservaController::class, 'destroy'])->name('reservas.destroy');
 
+    Route::post('/libros/{libro}/comentarios', [App\Http\Controllers\ComentarioController::class, 'store'])
+        ->name('comentarios.store')
+        ->middleware('auth');
+
+    Route::post('/libros/{libro}/comentarios', [App\Http\Controllers\ComentarioController::class, 'store'])->name('comentarios.store')->middleware('auth');
+    // NUEVA RUTA PARA EDITAR
+    Route::put('/comentarios/{id}', [App\Http\Controllers\ComentarioController::class, 'update'])->name('comentarios.update')->middleware('auth');
+
+    Route::delete('/comentarios/{id}', [App\Http\Controllers\ComentarioController::class, 'destroy'])->name('comentarios.destroy')->middleware('auth');
 
     // ==========================================
     // 2. ZONA EXCLUSIVA ALUMNOS (Blindaje Usuario)

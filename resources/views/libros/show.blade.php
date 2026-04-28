@@ -257,6 +257,216 @@
         </div>
     </div>
 
+    {{-- ========================================== --}}
+    {{-- SISTEMA DE VALORACIONES Y COMENTARIOS --}}
+    {{-- ========================================== --}}
+    <div class="card shadow-sm border-0 rounded-4 mt-4 mb-5">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+            <h5 class="mb-0 fw-bold text-secondary">
+                <i class="bi bi-chat-right-text-fill me-2 text-warning"></i>Opiniones de los lectores
+            </h5>
+        </div>
+        <div class="card-body p-4 pt-2">
+
+            {{-- FORMULARIO PARA DEJAR COMENTARIO --}}
+            @php
+            $haComentado = false;
+            if(auth()->check()) {
+            $haComentado = $libro->comentarios->where('user_id', auth()->id())->isNotEmpty();
+            }
+            @endphp
+
+            @auth
+            @if(!$haComentado)
+            <div class="bg-light p-4 rounded-4 mb-5 border border-secondary-subtle">
+                <h6 class="fw-bold mb-3">Deja tu valoración</h6>
+                <form id="form-comentario" action="{{ route('comentarios.store', $libro->id) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="_method" id="metodo-form" value="POST">
+
+                    {{-- MAGIA CSS: Estrellas --}}
+                    <div class="star-rating mb-3">
+                        <input type="radio" id="star5" name="estrellas" value="5" required />
+                        <label for="star5" title="5 estrellas"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star4" name="estrellas" value="4" />
+                        <label for="star4" title="4 estrellas"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star3" name="estrellas" value="3" />
+                        <label for="star3" title="3 estrellas"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star2" name="estrellas" value="2" />
+                        <label for="star2" title="2 estrellas"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star1" name="estrellas" value="1" />
+                        <label for="star1" title="1 estrella"><i class="bi bi-star-fill"></i></label>
+                    </div>
+
+                    <div class="mb-3">
+                        <textarea id="texto-comentario" name="contenido" class="form-control border-0 shadow-sm" rows="3" placeholder="¿Qué te ha parecido este libro? (Opcional)" style="resize: none;"></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="button" id="btn-cancelar-edicion" class="btn btn-secondary d-none me-2">Cancelar</button>
+                        <button type="submit" id="btn-submit-comentario" class="btn btn-warning fw-bold px-4 rounded-pill text-dark shadow-sm">Publicar opinión</button>
+                    </div>
+                </form>
+            </div>
+            @else
+            <div class="alert alert-success bg-success-subtle border-success-subtle text-success-emphasis text-center rounded-4 mb-5">
+                <i class="bi bi-check-circle-fill me-2"></i> Ya has valorado este libro. ¡Gracias por tu aportación!
+            </div>
+            @endif
+            @else
+            <div class="alert alert-light border border-secondary text-center rounded-4 mb-5">
+                Debes <a href="{{ route('login') }}" class="fw-bold text-decoration-none">iniciar sesión</a> para dejar una valoración.
+            </div>
+            @endauth
+
+            {{-- LISTADO DE COMENTARIOS --}}
+            <div class="comentarios-lista">
+                @forelse($libro->comentarios as $comentario)
+                <div class="d-flex mb-4">
+                    <div class="me-3">
+                        <div class="bg-primary bg-opacity-10 text-primary border border-primary-subtle d-flex justify-content-center align-items-center rounded-circle fw-bold fs-5 shadow-sm" style="width: 45px; height: 45px;">
+                            {{ substr($comentario->user->name, 0, 1) }}
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 border border-secondary-subtle p-3 rounded-4 bg-white shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="fw-bold mb-0 text-dark">{{ $comentario->user->name }}</h6>
+                            <small class="text-muted">{{ $comentario->created_at->diffForHumans() }}</small>
+                        </div>
+
+                        <div class="mb-2 text-warning" style="font-size: 0.9rem;">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <=$comentario->estrellas)
+                                <i class="bi bi-star-fill"></i>
+                                @else
+                                <i class="bi bi-star text-muted opacity-25"></i>
+                                @endif
+                                @endfor
+                        </div>
+
+                        @if($comentario->contenido)
+                        <p class="mb-2 text-secondary" style="font-size: 0.95rem;">{{ $comentario->contenido }}</p>
+                        @endif
+
+                        {{-- CONTROLES DEL COMENTARIO (Editar y Borrar) --}}
+                        <div class="d-flex justify-content-end gap-2 mt-2">
+
+                            {{-- Solo el dueño puede editar --}}
+                            @if(auth()->id() === $comentario->user_id)
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="prepararEdicion('{{ $comentario->id }}', '{{ $comentario->estrellas }}', '{{ addslashes($comentario->contenido) }}')">
+                                <i class="bi bi-pencil me-1"></i> Editar
+                            </button>
+                            @endif
+
+                            {{-- El dueño O el admin pueden borrar --}}
+                            @if(auth()->id() === $comentario->user_id || auth()->user()->rol === 'admin')
+                            <form action="{{ route('comentarios.destroy', $comentario->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta opinión?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar comentario">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                            @endif
+
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-stars fs-1 opacity-25 d-block mb-2"></i>
+                    <p class="mb-0">Aún no hay opiniones. ¡Sé el primero en valorar este libro!</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
 </div>
 </div>
+
+{{-- CSS Y SCRIPT DE LOS COMENTARIOS --}}
+<style>
+    .star-rating {
+        direction: rtl;
+        display: inline-flex;
+        font-size: 1.8rem;
+    }
+
+    .star-rating input[type=radio] {
+        display: none;
+    }
+
+    .star-rating label {
+        color: #e4e5e9;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+        padding: 0 0.1rem;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover~label,
+    .star-rating input[type=radio]:checked~label {
+        color: #ffc107;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById('form-comentario');
+        if (!form) return;
+
+        const urlOriginal = form.action;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+
+            fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.error || 'Hubo un error al procesar la solicitud.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        window.prepararEdicion = function(id, estrellas, contenido) {
+            form.action = `/comentarios/${id}`;
+            document.getElementById('metodo-form').value = 'PUT';
+            document.getElementById('texto-comentario').value = contenido;
+            document.getElementById(`star${estrellas}`).checked = true;
+
+            document.getElementById('btn-submit-comentario').innerText = 'Actualizar opinión';
+            document.getElementById('btn-submit-comentario').classList.replace('btn-warning', 'btn-primary');
+            document.getElementById('btn-cancelar-edicion').classList.remove('d-none');
+
+            form.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        };
+
+        document.getElementById('btn-cancelar-edicion').addEventListener('click', function() {
+            form.action = urlOriginal;
+            document.getElementById('metodo-form').value = 'POST';
+            form.reset();
+            document.getElementById('btn-submit-comentario').innerText = 'Publicar opinión';
+            document.getElementById('btn-submit-comentario').classList.replace('btn-primary', 'btn-warning');
+            this.classList.add('d-none');
+        });
+    });
+</script>
 @endsection
