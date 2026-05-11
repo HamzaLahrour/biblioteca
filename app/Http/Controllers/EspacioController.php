@@ -10,15 +10,12 @@ use App\Models\TipoEspacio;
 
 class EspacioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        // Cargamos la relación para evitar el problema N+1
+        // with() aquí para no hacer una query por cada espacio en la vista
         $query = \App\Models\Espacio::with('tipoEspacio');
 
-        // 1. Buscador de Texto Libre (Nombre, Código o Ubicación)
+        // busca por nombre, código o ubicación a la vez
         $query->when(request('buscar'), function ($q, $buscar) {
             $q->where(function ($q2) use ($buscar) {
                 $q2->where('nombre', 'like', "%{$buscar}%")
@@ -27,54 +24,46 @@ class EspacioController extends Controller
             });
         });
 
-        // 2. Filtro por Tipo de Espacio
+        // filtra por tipo si viene el parámetro en la URL
         $query->when(request('tipo_espacio_id'), function ($q, $tipo) {
             $q->where('tipo_espacio_id', $tipo);
         });
 
-        // 3. Filtro por Disponibilidad (Estado operativo)
+        // disponible es un booleano en BD, convertimos el string del filtro
         $query->when(request()->has('estado') && request('estado') !== '', function ($q) {
             $estado = request('estado') === 'disponible' ? 1 : 0;
             $q->where('disponible', $estado);
         });
 
-        // Ordenamos alfabéticamente por nombre
         $espacios = $query->orderBy('nombre', 'asc')->paginate(15);
 
-        // Traemos los tipos para el desplegable del filtro
+        // los tipos van al desplegable del filtro superior
         $tipos = \App\Models\TipoEspacio::orderBy('nombre')->get();
 
         return view('espacios.index', compact('espacios', 'tipos'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
+        // necesitamos los tipos para el select del formulario
         $tipos = TipoEspacio::orderBy('nombre')->get();
         return view('espacios.create', compact('tipos'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreEspacioRequest $request)
     {
+        // la validación ya la hace el FormRequest, aquí solo creamos
         Espacio::create($request->validated());
 
         return redirect()->route('espacios.index')->with('succes', 'Espacio creado con éxito');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Espacio $espacio)
     {
-        // 1. Preparamos la consulta (sin ejecutarla aún)
+        // construimos la query sin ejecutarla todavía para poder aplicar filtros encima
         $query = $espacio->reservas()->with('user');
 
-        // 2. Aplicamos filtros dinámicos leyendo la URL con el helper global
+        // los tres filtros son opcionales, solo se aplican si vienen en la URL
         if (request()->filled('fecha_inicio')) {
             $query->whereDate('fecha_reserva', '>=', request('fecha_inicio'));
         }
@@ -87,7 +76,7 @@ class EspacioController extends Controller
             $query->where('estado', request('estado'));
         }
 
-        // 3. Calculamos las métricas para las tarjetas superiores
+        // estas métricas son independientes de los filtros, siempre muestran el total real
         $metricas = [
             'historico'   => $espacio->reservas()->count(),
             'activas_hoy' => $espacio->reservas()
@@ -97,7 +86,7 @@ class EspacioController extends Controller
             'canceladas'  => $espacio->reservas()->where('estado', 'cancelada')->count(),
         ];
 
-        // 4. Ejecutamos la consulta final con ordenación y paginación
+        // las más recientes primero, y si coincide fecha desempatamos por hora
         $reservas = $query->orderBy('fecha_reserva', 'desc')
             ->orderBy('hora_inicio', 'desc')
             ->paginate(10);
@@ -105,22 +94,17 @@ class EspacioController extends Controller
         return view('espacios.show', compact('espacio', 'reservas', 'metricas'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Espacio $espacio)
     {
         $tipos = TipoEspacio::orderBy('nombre')->get();
         return view('espacios.edit', compact('espacio', 'tipos'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateEspacioRequest $request, Espacio $espacio)
     {
         $espacio->fill($request->validated());
 
+        // si no tocó nada no tiene sentido lanzar el UPDATE
         if (!$espacio->isDirty()) {
             return redirect()->route('espacios.index')
                 ->with('info', 'No realizaste ningún cambio.');
@@ -132,11 +116,9 @@ class EspacioController extends Controller
             ->with('success', 'Espacio actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Espacio $espacio)
     {
+        // no dejamos borrar si tiene reservas asociadas, para no romper el histórico
         if ($espacio->reservas()->count() > 0) {
             return redirect()->route('espacios.index')
                 ->with('error', 'No puedes borrar un espacio que contenga reservas.');

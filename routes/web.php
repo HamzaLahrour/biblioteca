@@ -13,9 +13,7 @@ use App\Http\Controllers\FestivoController;
 use App\Http\Controllers\CatalogoController;
 use App\Http\Controllers\PerfilUsuarioController;
 
-// ==========================================
 // 1. ZONA PÚBLICA (Sin loguear)
-// ==========================================
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -28,12 +26,9 @@ Route::prefix('usuarios')->group(function () {
 });
 
 
-// ==========================================
-// ZONA PRIVADA (Requiere estar logueado)
-// ==========================================
+
 Route::middleware(['auth'])->group(function () {
 
-    // Cerrar sesión (Común para Administradores y Usuarios)
     Route::post('/usuarios/logout', [UserController::class, 'logout'])->name('usuarios.logout');
     Route::delete('/reservas/{reserva}', [ReservaController::class, 'destroy'])->name('reservas.destroy');
 
@@ -42,44 +37,35 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('auth');
 
     Route::post('/libros/{libro}/comentarios', [App\Http\Controllers\ComentarioController::class, 'store'])->name('comentarios.store')->middleware('auth');
-    // NUEVA RUTA PARA EDITAR
     Route::put('/comentarios/{id}', [App\Http\Controllers\ComentarioController::class, 'update'])->name('comentarios.update')->middleware('auth');
 
     Route::delete('/comentarios/{id}', [App\Http\Controllers\ComentarioController::class, 'destroy'])->name('comentarios.destroy')->middleware('auth');
 
-    // ==========================================
-    // 2. ZONA EXCLUSIVA ALUMNOS (Blindaje Usuario)
-    // ==========================================
+    //ZONA EXCLUSIVA ALUMNOS
+
     Route::middleware(['can:es_usuario'])->group(function () {
 
         Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
 
-        // Espacio del Alumno
         Route::get('/mi-espacio', [PerfilUsuarioController::class, 'index'])->name('perfil.index');
 
-        // --- EL FLUJO DE RESERVAS ---
-        // 1. Ver catálogo de Tipos de Espacio
+
         Route::get('/reservar-espacio', [App\Http\Controllers\ReservaUsuarioController::class, 'index'])->name('reservas_usuario.index');
 
-        // 2. Formulario de fecha/hora
         Route::get('/reservar-espacio/tipo/{tipo}', [App\Http\Controllers\ReservaUsuarioController::class, 'create'])->name('reservas_usuario.create');
 
-        // 3. Comprobar disponibilidad y asignar
         Route::post('/reservar-espacio/tipo/{tipo}/comprobar', [App\Http\Controllers\ReservaUsuarioController::class, 'comprobar'])->name('reservas_usuario.comprobar');
 
-        // 4. Guardar definitivo
         Route::post('/reservar-espacio/guardar', [App\Http\Controllers\ReservaUsuarioController::class, 'store'])->name('reservas_usuario.store');
 
         Route::post('/perfil/prestamos/{prestamo}/renovar', [App\Http\Controllers\PerfilUsuarioController::class, 'renovar'])->name('perfil.prestamos.renovar');
-        // (Aquí meteremos luego las rutas para que el alumno reserve salas)
         Route::get('/mi-espacio/historial-reservas', [App\Http\Controllers\PerfilUsuarioController::class, 'historialReservas'])->name('perfil.reservas.historial');
         Route::get('/catalogo/{libro}', [CatalogoController::class, 'show'])->name('catalogo.show');
     });
 
 
-    // ==========================================
-    // 3. ZONA EXCLUSIVA ADMIN (Blindaje Administrador)
-    // ==========================================
+    //ZONA EXCLUSIVA ADMIN 
+
     Route::middleware(['can:es_admin'])->group(function () {
 
         Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');

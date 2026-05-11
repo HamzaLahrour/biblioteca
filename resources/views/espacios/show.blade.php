@@ -10,9 +10,7 @@
 </div>
 
 <div class="row g-4">
-    {{-- =========================================================================
-         COLUMNA IZQUIERDA: PERFIL DEL ESPACIO (Sticky)
-         ========================================================================= --}}
+
     <div class="col-lg-4 col-xl-3">
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-body p-4 text-center border-bottom">
@@ -68,9 +66,7 @@
         </div>
     </div>
 
-    {{-- =========================================================================
-         COLUMNA DERECHA: DASHBOARD DE RESERVAS Y FILTROS
-         ========================================================================= --}}
+
     <div class="col-lg-8 col-xl-9">
 
         {{-- 1. TARJETAS DE MÉTRICAS RÁPIDAS --}}
@@ -164,7 +160,7 @@
                 </div>
             </div>
 
-            {{-- 3. TABLA DE RESULTADOS --}}
+            {{-- Tabla de resultados --}}
             <div class="card-body p-0 px-4 pb-4">
                 @if($reservas->count() > 0)
                 <div class="table-responsive">
@@ -210,7 +206,6 @@
                 </div>
 
                 <div class="mt-4 d-flex justify-content-end">
-                    {{-- Conservamos los filtros en la paginación --}}
                     {{ $reservas->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
                 @else

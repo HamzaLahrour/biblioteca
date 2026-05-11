@@ -17,7 +17,6 @@
         {{-- COLUMNA IZQUIERDA: EL CARNET Y SANCIONES --}}
         <div class="col-lg-4">
 
-            {{-- 🚨 ALERTA DE SANCIÓN --}}
             @if($sancionActiva)
             <div class="alert custom-alert-danger d-flex align-items-start gap-3 shadow-sm mb-4" role="alert">
                 <i class="bi bi-shield-fill-exclamation fs-3 mt-1"></i>
@@ -31,7 +30,7 @@
             </div>
             @endif
 
-            {{-- 🪪 CARNET DIGITAL PREMIUM --}}
+            {{-- 🪪 CARNET DIGITAL --}}
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 digital-card position-relative">
                 {{-- Efectos de fondo abstracto --}}
                 <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 150px; height: 150px; top: -50px; right: -50px;"></div>
@@ -63,7 +62,7 @@
         {{-- COLUMNA DERECHA: MIS COSAS (Préstamos y Reservas) --}}
         <div class="col-lg-8">
 
-            {{-- 📚 SECCIÓN: MIS PRÉSTAMOS ACTIVOS --}}
+            {{-- MIS PRÉSTAMOS ACTIVOS --}}
             <div class="d-flex justify-content-between align-items-end mb-3">
                 <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Mis Lecturas</h4>
                 <a href="{{ route('catalogo.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">Explorar</a>
@@ -95,7 +94,6 @@
                                 <h6 class="fw-bold mb-1 text-truncate" style="color: var(--secondary-dark);">{{ $prestamo->libro->titulo }}</h6>
                                 <p class="text-muted small mb-1 text-truncate">{{ $prestamo->libro->autor }}</p>
 
-                                {{-- Fecha: ahora en gris, sin competir con el título --}}
                                 <div class="small text-muted mb-2" style="font-size: 0.78rem;">
                                     <i class="bi bi-calendar2 me-1"></i> {{ $vence->format('d/m/Y') }}
                                 </div>
@@ -180,7 +178,7 @@
             $enCurso = $ahora->between($inicio, $fin);
             $minutosParaInicio = $ahora->diffInMinutes($inicio, false);
 
-            // Regla: Cancelable si no ha pasado, no está en curso y faltan >= 30 min
+            //Cancelable si no ha pasado, no está en curso y faltan >= 30 min
             $puedeCancelar = !$yaPaso && !$enCurso && ($minutosParaInicio >= 30);
             @endphp
 
@@ -207,7 +205,6 @@
                             </div>
                         </div>
 
-                        {{-- BOTONERA INVISIBLE (Solo acciones) --}}
                         @if($puedeCancelar)
                         <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva de sala?');">
                             @csrf
@@ -241,7 +238,6 @@
 </div>
 
 <style>
-    /* VARIABLES LOCALES (ADN LibreLah) */
     :root {
         --primary: #1E90FF;
         --secondary-dark: #0D47A1;
@@ -394,7 +390,6 @@
         transform: rotate(-5deg);
     }
 
-    /* Utilidad para truncar textos largos en tarjetas pequeñas */
     .min-w-0 {
         min-width: 0;
     }

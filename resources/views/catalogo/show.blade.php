@@ -12,7 +12,6 @@
         </a>
     </div>
 
-    {{-- BLOQUE SUPERIOR: EL LIBRO --}}
     <div class="row g-4 g-lg-5 mb-5 align-items-center">
 
         <div class="col-md-4 col-lg-3 d-flex justify-content-center">
@@ -29,7 +28,7 @@
         <div class="col-md-8 col-lg-9 pt-2">
 
             @php
-            // Calculamos los disponibles reales basándonos en tu lógica
+            // Calculamos los disponibles reales
             $prestados = $libro->prestamos()->where('estado', 'activo')->count();
             $disponibles = $libro->copias_totales - $prestados;
             @endphp
@@ -460,13 +459,16 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // Lógica para mostrar botón de "Ver más" si el texto es muy largo
+        // cuando el texto de un comentario es más alto de lo que se muestra,
+        // aparece el botón de "ver más" que por defecto está oculto con d-none
         document.querySelectorAll('.comentario-texto').forEach(function(el) {
             if (el.scrollHeight > el.clientHeight) {
                 el.nextElementSibling.classList.remove('d-none');
             }
         });
 
+        // alterna entre mostrar el texto completo o recortado
+        // y cambia el texto del botón según el estado actual
         window.toggleTexto = function(btn) {
             const texto = btn.previousElementSibling;
             if (texto.classList.contains('text-truncate-multiline')) {
@@ -478,10 +480,11 @@
             }
         };
 
-        // Lógica del formulario de comentarios
+        // si no existe el formulario en esta página no hacemos nada más
         const form = document.getElementById('form-comentario');
         if (!form) return;
 
+        // guardamos la URL original del form para poder restaurarla al cancelar edición
         const urlBase = "{{ url('/comentarios') }}";
         const urlOriginal = form.action;
         const btnSubmit = document.getElementById('btn-submit-comentario');
@@ -489,6 +492,8 @@
         const contador = document.getElementById('contador-caracteres');
         const MAX_CANTIDAD = 1000;
 
+        // contador de caracteres en tiempo real
+        // si se pasa del límite bloqueamos el botón y ponemos el contador en rojo
         textarea.addEventListener('input', function() {
             const longitud = this.value.length;
             contador.textContent = `${longitud} / ${MAX_CANTIDAD}`;
@@ -504,9 +509,12 @@
             }
         });
 
+        // interceptamos el envío del formulario para hacerlo por fetch (AJAX)
+        // así no recargamos la página entera al publicar un comentario
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // las estrellas son obligatorias, si no hay ninguna marcada paramos aquí
             const estrellasSeleccionadas = form.querySelector('input[name="estrellas"]:checked');
             const errorEstrellas = document.getElementById('error-estrellas');
 
@@ -518,6 +526,8 @@
 
             const formData = new FormData(this);
 
+            // mandamos el formulario al servidor sin recargar la página
+            // X-Requested-With le dice a Laravel que es una petición AJAX
             fetch(this.action, {
                     method: 'POST',
                     body: formData,
@@ -526,6 +536,8 @@
                     }
                 })
                 .then(response => {
+                    // dejamos pasar los 400 y 403 para manejarlos nosotros,
+                    // el resto de errores los lanzamos directamente
                     if (!response.ok && response.status !== 400 && response.status !== 403) {
                         throw new Error('Error en la solicitud al servidor.');
                     }
@@ -533,6 +545,8 @@
                 })
                 .then(data => {
                     if (data.success) {
+                        // ocultamos el form y mostramos el mensaje de éxito
+                        // y recargamos al cabo de 800ms para que se vea el comentario nuevo
                         const alerta = document.getElementById('alerta-exito');
                         const bloqueForm = document.getElementById('bloque-form');
 
@@ -552,15 +566,20 @@
                 });
         });
 
+        // rellena el formulario con los datos del comentario que se quiere editar
+        // cambia el método a PUT y la URL al endpoint de actualización
         window.prepararEdicion = function(id, estrellas, contenido) {
             const alerta = document.getElementById('alerta-exito');
             const bloqueForm = document.getElementById('bloque-form');
             if (alerta) alerta.classList.add('d-none');
             bloqueForm.classList.remove('d-none');
 
+            // apuntamos el form al endpoint de update en vez del de store
             form.action = `${urlBase}/${id}`;
             document.getElementById('metodo-form').value = 'PUT';
 
+            // metemos el contenido actual y disparamos el evento input
+            // para que el contador de caracteres se actualice solo
             textarea.value = contenido;
             textarea.dispatchEvent(new Event('input'));
 
@@ -569,6 +588,7 @@
             document.getElementById('btn-submit-comentario').innerText = 'Actualizar reseña';
             document.getElementById('btn-cancelar-edicion').classList.remove('d-none');
 
+            // hacemos scroll hasta el form para que el usuario no tenga que buscarlo
             bloqueForm.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center'
@@ -576,6 +596,7 @@
             textarea.focus();
         };
 
+        // cancela la edición y vuelve el formulario a su estado original de creación
         document.getElementById('btn-cancelar-edicion').addEventListener('click', function() {
             const alerta = document.getElementById('alerta-exito');
             const bloqueForm = document.getElementById('bloque-form');
@@ -583,6 +604,7 @@
             if (alerta) alerta.classList.add('d-none');
             bloqueForm.classList.add('d-none');
 
+            // restauramos la URL original y el método POST para el siguiente comentario
             form.action = urlOriginal;
             document.getElementById('metodo-form').value = 'POST';
 

@@ -211,7 +211,7 @@
                     </div>
                 </header>
 
-                {{-- ALERTAS SEMAFÓRICAS --}}
+                {{-- ALERTAS--}}
 
                 {{--VERDE:Éxito y confirmaciones --}}
                 @if(session('success'))

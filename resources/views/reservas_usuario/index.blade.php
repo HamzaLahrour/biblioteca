@@ -4,7 +4,6 @@
 @section('content')
 <div class="container py-5 mb-5">
 
-    {{-- CABECERA FASE GOLD --}}
     <div class="text-center mb-5">
         <h2 class="fw-bold mb-2" style="color: var(--text-main); letter-spacing: -0.8px;">
             ¿Qué necesitas <span class="text-gradient">hoy?</span>
@@ -14,7 +13,6 @@
         </p>
     </div>
 
-    {{-- ALERTA DE ERROR PREMIUM --}}
     @if($errors->has('error_reserva'))
     <div class="row justify-content-center mb-4">
         <div class="col-md-8 col-lg-6">
@@ -36,7 +34,6 @@
             <div class="card h-100 space-card border-0">
                 <div class="card-body p-4 d-flex flex-column text-center">
 
-                    {{-- Icono Inyectado con ADN --}}
                     <div class="icon-wrapper mx-auto mb-4">
                         <i class="bi bi-grid-1x2"></i>
                     </div>
@@ -58,7 +55,6 @@
                             @endif
                         </div>
 
-                        {{-- Botones Branded --}}
                         @if($tipo->espacios_count > 0)
                         <a href="{{ route('reservas_usuario.create', $tipo->id) }}" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm btn-action">
                             Reservar ahora

@@ -60,10 +60,9 @@
         @endforeach
     </div>
 
-    {{-- MODO EXPLORACIÓN (NETFLIX) - Solo si no hay búsqueda activa --}}
     @if(!request('buscar') && !request('categoria') && !request('anio'))
 
-    {{-- FILA 1: TENDENCIAS (MÁS PRESTADOS) - PODIO ESTÁTICO DE 4 --}}
+    {{-- FILA 1: TENDENCIAS --}}
     @if(isset($librosPopulares) && $librosPopulares->count() > 0)
     <div class="mb-2 mx-auto" style="max-width: 1200px;">
         <div class="d-flex align-items-center mb-4">
@@ -84,11 +83,11 @@
     </div>
     @endif
 
-    {{-- FILAS DINÁMICAS POR CATEGORÍA (Con Scroll) --}}
+    {{-- FILAS DINÁMICAS POR CATEGORÍA --}}
     @if(isset($categoriasEscaparate))
     @foreach($categoriasEscaparate as $catEscaparate)
 
-    {{-- LÍNEA DIVISORA ELEGANTE --}}
+    {{-- LÍNEA DIVISORA--}}
     <hr class="mx-auto" style="max-width: 1200px; opacity: 0.08; border-color: var(--secondary-dark); margin-top: 3.5rem; margin-bottom: 2.5rem;">
 
     <div class="mb-2 mx-auto position-relative" style="max-width: 1200px;">
@@ -119,7 +118,7 @@
     @endforeach
     @endif
 
-    {{-- ESTADO DE RESULTADOS (CUADRÍCULA): Solo sale si has buscado o filtrado algo --}}
+    {{-- Solo sale si has buscado o filtrado algo --}}
     @else
     <div class="d-flex justify-content-between align-items-center mb-4 mx-auto" style="max-width: 1200px;">
         <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Resultados de tu búsqueda</h4>
@@ -339,7 +338,7 @@
 
         /* TARJETAS */
         .book-card {
-            border-radius: 20px;
+            border-radius: 10px;
             background: #fff;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -361,7 +360,7 @@
         .book-cover {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: fill;
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
@@ -542,30 +541,38 @@
     </style>
 
     <script>
+        // mueve el carrusel horizontal hacia la izquierda o derecha
+        // scrollAmount positivo = derecha, negativo = izquierda
         function scrollRow(containerId, scrollAmount) {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.scrollBy({
+            const contenedor = document.getElementById(containerId);
+            if (contenedor) {
+                contenedor.scrollBy({
                     left: scrollAmount,
-                    behavior: 'smooth'
+                    behavior: 'smooth' // animación suave en vez de salto brusco
                 });
             }
         }
+
+        // cuando se envía el buscador, cambiamos el icono de lupa por un spinner
+        // para que el usuario sepa que está cargando y no piense que se ha colgado
         document.getElementById('searchForm').addEventListener('submit', function() {
             document.getElementById('searchIcon').classList.add('d-none');
             document.getElementById('searchSpinner').classList.remove('d-none');
         });
 
+        // filtro en tiempo real del offcanvas de categorías
+        // cada vez que el usuario escribe, ocultamos las que no coinciden
         document.getElementById('filtroCategorias').addEventListener('input', function(e) {
             const termino = e.target.value.toLowerCase();
-            const items = document.querySelectorAll('.category-filterable');
+            const elementos = document.querySelectorAll('.category-filterable');
 
-            items.forEach(item => {
-                const texto = item.querySelector('.form-check-label').innerText.toLowerCase();
+            elementos.forEach(elemento => {
+                const texto = elemento.querySelector('.form-check-label').innerText.toLowerCase();
+                // si el nombre de la categoría contiene lo que escribió, la mostramos
                 if (texto.includes(termino)) {
-                    item.style.display = 'block';
+                    elemento.style.display = 'block';
                 } else {
-                    item.style.display = 'none';
+                    elemento.style.display = 'none';
                 }
             });
         });

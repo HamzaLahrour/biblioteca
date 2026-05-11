@@ -18,6 +18,8 @@ class ConfiguracionController extends Controller
 
     public function update(UpdateConfiguracionRequest $request)
     {
+        // recorremos cada clave y actualizamos su valor en la tabla
+
         foreach ($request->configuraciones as $clave => $valor) {
             Configuracion::where('clave', $clave)->update(['valor' => $valor]);
         }

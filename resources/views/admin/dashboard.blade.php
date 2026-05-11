@@ -5,7 +5,6 @@
 @section('content')
 <div class="container-fluid py-3">
 
-    {{-- 1. TARJETAS MÉTRICAS --}}
     <div class="row g-4 mb-4">
 
         <div class="col-12 col-sm-6 col-xl-3">

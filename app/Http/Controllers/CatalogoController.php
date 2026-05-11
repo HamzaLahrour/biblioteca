@@ -10,37 +10,31 @@ class CatalogoController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Todas las categorías para el Offcanvas
         $categorias = Categoria::orderBy('nombre')->get();
 
-        // 2. Categorías Populares (Píldoras)
         $categoriasPopulares = Categoria::withCount('libros')
             ->orderByDesc('libros_count')
             ->take(5)
             ->get();
 
-        // 3. TENDENCIAS: Los 8 libros más prestados (o destacados)
-        // (Ajusta 'prestamos' al nombre real de tu relación si es diferente)
+        // los 8 más prestados
         $librosPopulares = Libro::with('categoria')
             ->withCount('prestamos')
             ->orderByDesc('prestamos_count')
             ->take(8)
             ->get();
 
-        // 4. ESCAPARATE NETFLIX (El consejo del profe)
-        // Cogemos 3 categorías con bastantes libros para hacer las filas de scroll
+        // categorías con al menos 4 libros para el escaparate
         $categoriasEscaparate = Categoria::has('libros', '>=', 4)
             ->withCount('libros')
             ->orderByDesc('libros_count')
             ->take(5)
             ->get();
 
-        // A cada categoría le cargamos sus 8 libros más recientes/populares
         foreach ($categoriasEscaparate as $categoria) {
             $categoria->setRelation('libros_destacados', $categoria->libros()->take(8)->get());
         }
 
-        // 5. Catálogo general con sus filtros
         $query = Libro::with('categoria');
 
         $query->when($request->buscar, function ($q, $buscar) {

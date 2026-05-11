@@ -27,8 +27,6 @@ class ReservaUsuarioController extends Controller
         }])->orderBy('nombre')->get();
 
 
-
-        // Carga la vista desde la NUEVA carpeta
         return view('reservas_usuario.index', compact('tipos'));
     }
 

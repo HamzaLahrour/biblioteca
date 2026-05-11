@@ -6,12 +6,10 @@
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-5 text-center">
 
-            {{-- Animación de éxito premium --}}
             <div class="success-icon-wrapper mx-auto mb-4 shadow-sm">
                 <i class="bi bi-check2-circle"></i>
             </div>
 
-            {{-- Cabecera con ADN --}}
             <h2 class="fw-bold mb-2" style="color: var(--text-main); letter-spacing: -0.5px;">
                 ¡Hemos encontrado un <span class="text-gradient">sitio!</span>
             </h2>
@@ -54,7 +52,6 @@
                 </div>
             </div>
 
-            {{-- FORMULARIO DEFINITIVO (Botones Sutiles) --}}
             <form action="{{ route('reservas_usuario.store') }}" method="POST" class="mt-2">
                 @csrf
                 <input type="hidden" name="espacio_id" value="{{ $espacio->id }}">

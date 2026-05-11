@@ -53,7 +53,6 @@
             </form>
         </div>
 
-        {{-- TABLA DE DATOS (Pulida) --}}
         @if($libros->count() > 0)
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -69,7 +68,6 @@
                 <tbody class="border-top-0">
                     @foreach($libros as $libro)
                     <tr>
-                        {{-- PORTADA con pulido sutil --}}
                         <td class="py-3 pl-3 border-bottom-subtle">
                             @if($libro->portada)
                             <img src="{{ $libro->portada }}" alt="Portada" class="rounded shadow-sm border-0" style="width: 45px; height: 65px; object-fit: cover;">
@@ -80,13 +78,11 @@
                             @endif
                         </td>
 
-                        {{-- TÍTULO Y AUTOR --}}
                         <td class="py-3 pl-2 border-bottom-subtle">
                             <div class="fw-bold text-dark text-wrap" style="max-width: 250px; font-size: 1.05rem;">{{ $libro->titulo }}</div>
                             <div class="text-primary mt-1 fw-medium" style="font-size: 0.85rem;"><i class="bi bi-person me-1"></i>{{ $libro->autor }}</div>
                         </td>
 
-                        {{-- INVENTARIO (ISBN + Categoría) --}}
                         <td class="py-3 border-bottom-subtle">
                             <div class="mb-2">
                                 @if($libro->isbn)
@@ -144,7 +140,6 @@
             </table>
         </div>
 
-        {{-- PAGINACIÓN CON MUCHO AIRE Y TRADUCIDA AL ESPAÑOL --}}
         <div class="mt-5 mb-2 d-flex flex-column flex-md-row justify-content-between align-items-center gap-4 custom-pagination">
             <div class="text-muted small bg-light px-3 py-2 rounded-pill border border-neutral-100">
                 Mostrando del <span class="fw-bold text-dark">{{ $libros->firstItem() ?? 0 }}</span> al <span class="fw-bold text-dark">{{ $libros->lastItem() ?? 0 }}</span> de <span class="fw-bold text-dark">{{ $libros->total() }}</span> resultados
@@ -210,7 +205,6 @@
         transform: translateY(-1px);
     }
 
-    /* === MAGIA PARA LA PAGINACIÓN === */
     .custom-pagination nav>div.d-flex.justify-content-between.flex-fill.d-sm-none {
         display: none !important;
         /* Oculta texto en móvil */

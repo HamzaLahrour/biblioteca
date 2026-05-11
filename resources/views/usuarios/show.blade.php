@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
+    <div class="col-md-10 col-lg-10"> <!-- Amplié un poco el contenedor para las tablas -->
 
         <div class="mb-3">
             <a href="{{ route('usuarios.index') }}" class="text-decoration-none text-muted fw-medium">
@@ -24,6 +24,7 @@
 
             <div class="card-body p-4">
 
+                <!-- DATOS DEL USUARIO -->
                 <div class="row align-items-center mb-5">
                     <div class="col-md-4 text-center border-end">
                         <div class="mb-3">
@@ -83,46 +84,152 @@
                     </div>
                 </div>
 
-                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-activity me-2"></i>Actividad en la Biblioteca</h5>
-                <div class="row g-3 mb-4">
+                @php
+                $totalPrestamos = $usuario->prestamos->count();
+                $totalReservas = $usuario->reservas->count();
+                $totalSanciones = $usuario->sanciones->count();
+                $tieneActividad = $totalPrestamos > 0 || $totalReservas > 0 || $totalSanciones > 0;
+                @endphp
 
-                    @php
-                    $totalPrestamos = $usuario->prestamos->count();
-                    $totalReservas = $usuario->reservas->count();
-                    $totalSanciones = $usuario->sanciones->count();
-                    $tieneActividad = $totalPrestamos > 0 || $totalReservas > 0 || $totalSanciones > 0;
-                    @endphp
+                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-activity me-2"></i>Detalle de Actividad en la Biblioteca</h5>
 
-                    <div class="col-md-4">
-                        <div class="card border-info bg-info bg-opacity-10 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <h6 class="text-info-emphasis fw-bold">Préstamos</h6>
-                                <h3 class="mb-0 text-info">{{ $totalPrestamos }}</h3>
-                            </div>
+                <!-- PESTAÑAS DE ACTIVIDAD -->
+                <ul class="nav nav-tabs mb-4" id="actividadTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold text-info-emphasis" id="prestamos-tab" data-bs-toggle="tab" data-bs-target="#prestamos-pane" type="button" role="tab">
+                            <i class="bi bi-book"></i> Préstamos
+                            <span class="badge bg-info text-dark ms-1">{{ $totalPrestamos }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-success-emphasis" id="reservas-tab" data-bs-toggle="tab" data-bs-target="#reservas-pane" type="button" role="tab">
+                            <i class="bi bi-calendar-check"></i> Reservas
+                            <span class="badge bg-success ms-1">{{ $totalReservas }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-danger-emphasis" id="sanciones-tab" data-bs-toggle="tab" data-bs-target="#sanciones-pane" type="button" role="tab">
+                            <i class="bi bi-exclamation-triangle"></i> Sanciones
+                            <span class="badge bg-danger ms-1">{{ $totalSanciones }}</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- CONTENIDO DE LAS PESTAÑAS -->
+                <div class="tab-content" id="actividadTabsContent">
+
+                    <!-- TABLA DE PRÉSTAMOS -->
+                    <div class="tab-pane fade show active" id="prestamos-pane" role="tabpanel" tabindex="0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle border">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Libro/Elemento</th>
+                                        <th>Fecha Préstamo</th>
+                                        <th>Fecha Devolución</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($usuario->prestamos as $prestamo)
+                                    <tr>
+                                        <!-- Adapta $prestamo->libro->titulo según tu base de datos -->
+                                        <td class="fw-medium">{{ $prestamo->libro->titulo ?? 'Recurso desconocido' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($prestamo->fecha_prestamo)->format('d/m/Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($prestamo->fecha_devolucion)->format('d/m/Y') }}</td>
+                                        <td>
+                                            @if($prestamo->devuelto)
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">Devuelto</span>
+                                            @else
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Activo</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">Este usuario no tiene préstamos registrados.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="card border-success bg-success bg-opacity-10 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <h6 class="text-success-emphasis fw-bold">Reservas</h6>
-                                <h3 class="mb-0 text-success">{{ $totalReservas }}</h3>
-                            </div>
+                    <!-- TABLA DE RESERVAS -->
+                    <div class="tab-pane fade" id="reservas-pane" role="tabpanel" tabindex="0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle border">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Espacio / Recurso</th>
+                                        <th>Fecha</th>
+                                        <th>Hora Inicio</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($usuario->reservas as $reserva)
+                                    <tr>
+                                        <!-- Adapta los campos de reserva según tu DB -->
+                                        <td class="fw-medium">{{ $reserva->espacio->nombre ?? 'Espacio' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($reserva->hora_inicio)->format('H:i') }}</td>
+                                        <td>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ $reserva->estado ?? 'Pendiente' }}</span>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">Este usuario no ha realizado reservas.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="card border-danger bg-danger bg-opacity-10 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <h6 class="text-danger-emphasis fw-bold">Sanciones</h6>
-                                <h3 class="mb-0 text-danger">{{ $totalSanciones }}</h3>
-                            </div>
+                    <!-- TABLA DE SANCIONES -->
+                    <div class="tab-pane fade" id="sanciones-pane" role="tabpanel" tabindex="0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle border">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Motivo</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha Fin</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($usuario->sanciones as $sancion)
+                                    <tr>
+                                        <!-- Adapta los campos de sanción según tu DB -->
+                                        <td class="fw-medium text-danger">{{ $sancion->motivo }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($sancion->fecha_inicio)->format('d/m/Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($sancion->fecha_fin)->format('d/m/Y') }}</td>
+                                        <td>
+                                            @if(now()->lessThanOrEqualTo($sancion->fecha_fin))
+                                            <span class="badge bg-danger">Activa</span>
+                                            @else
+                                            <span class="badge bg-secondary">Cumplida</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-3">El usuario no tiene un historial de sanciones.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+
                 </div>
 
                 <hr class="text-muted opacity-25 mt-4">
 
+                <!-- BOTONES DE ACCIÓN -->
                 <div class="d-flex justify-content-end gap-2 pt-2">
                     <a href="{{ route('usuarios.edit', $usuario) }}" class="btn btn-primary px-4 shadow-sm">
                         <i class="bi bi-pencil-square me-1"></i> Editar Perfil

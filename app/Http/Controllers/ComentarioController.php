@@ -17,6 +17,7 @@ class ComentarioController extends Controller
 
         $libro = \App\Models\Libro::findOrFail($libro_id);
 
+        // un usuario solo puede comentar una vez por libro
         if (Comentario::where('user_id', auth()->id())->where('libro_id', $libro->id)->exists()) {
             return response()->json(['error' => 'Ya has comentado este libro.'], 400);
         }
@@ -28,13 +29,12 @@ class ComentarioController extends Controller
             'contenido' => $request->contenido,
         ]);
 
-        // Cargamos los datos del usuario para mandarlos al Frontend
+        // necesitamos el user cargado para pintarlo en el frontend sin recargar
         $comentario->load('user');
 
         return response()->json(['success' => true, 'mensaje' => 'Comentario publicado', 'comentario' => $comentario]);
     }
 
-    // NUEVO MÉTODO PARA ACTUALIZAR
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -44,7 +44,7 @@ class ComentarioController extends Controller
 
         $comentario = \App\Models\Comentario::findOrFail($id);
 
-        // Seguridad: Solo el dueño puede editar su propio comentario
+        // que nadie pueda editar el comentario de otro
         if ($comentario->user_id !== auth()->id()) {
             return response()->json(['error' => 'No autorizado.'], 403);
         }
@@ -61,7 +61,7 @@ class ComentarioController extends Controller
     {
         $comentario = Comentario::findOrFail($id);
 
-        // SEGURIDAD: Comprobamos si es el dueño o si es el admin
+        // el admin puede borrar cualquier comentario, el usuario solo el suyo
         $esDueño = $comentario->user_id === auth()->id();
         $esAdmin = auth()->user()->rol === 'admin';
 

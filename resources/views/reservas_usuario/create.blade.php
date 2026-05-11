@@ -160,9 +160,6 @@
         outline: none;
     }
 
-    /* Eliminar el icono de calendario por defecto en webkit si prefieres el de bootstrap (opcional) */
-    /* .custom-input::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.2s; } */
-    /* .custom-input::-webkit-calendar-picker-indicator:hover { opacity: 1; } */
 
     /* BOTÓN PRIMARIO */
     .btn-action {

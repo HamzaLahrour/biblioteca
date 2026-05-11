@@ -15,7 +15,6 @@
 
     <div class="card-body p-4 pt-3">
 
-        {{-- 🔍 BARRA DE FILTROS (Limpia y útil) --}}
         <div class="bg-light p-3 rounded-4 mb-4 border">
             <form action="{{ route('usuarios.index') }}" method="GET" class="row g-2 align-items-center">
 
@@ -26,7 +25,6 @@
                     </div>
                 </div>
 
-                {{-- Filtro de Estado del Lector (La paranoia útil) --}}
                 <div class="col-md-4">
                     <select name="estado_lector" class="form-select form-select-sm">
                         <option value="">Todos los usuarios</option>
@@ -36,7 +34,8 @@
                 </div>
 
                 <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-sm btn-dark w-100 fw-medium shadow-sm">Filtrar</button>
+                    {{-- Botón Filtrar ahora es azul (btn-primary) --}}
+                    <button type="submit" class="btn btn-sm btn-primary w-100 fw-medium shadow-sm">Filtrar</button>
                     @if(request()->anyFilled(['buscar', 'estado_lector']))
                     <a href="{{ route('usuarios.index') }}" class="btn btn-sm btn-outline-secondary" title="Limpiar"><i class="bi bi-x-lg"></i></a>
                     @endif
@@ -44,7 +43,6 @@
             </form>
         </div>
 
-        {{-- TABLA DE DATOS CLÁSICA --}}
         @if($usuarios->count() > 0)
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -55,14 +53,14 @@
                         <th scope="col" class="border-0 py-3">DNI</th>
                         <th scope="col" class="border-0 py-3 text-center">Edad</th>
                         <th scope="col" class="border-0 py-3">Rol</th>
-                        <th scope="col" class="border-0 rounded-end-3 py-3 text-end">Acciones</th>
+                        <th scope="col" class="border-0 rounded-end-3 py-3 text-end pe-4">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="border-top-0">
                     @foreach($usuarios as $usuario)
                     <tr>
                         {{-- AVATAR --}}
-                        <td class="py-3 text-center">
+                        <td class="py-3 text-center border-bottom-subtle">
                             @if($usuario->rol === 'admin')
                             <i class="bi bi-person-badge-fill fs-3 text-primary"></i>
                             @else
@@ -83,7 +81,7 @@
                         </td>
 
                         {{-- NOMBRE Y CONTACTO --}}
-                        <td class="py-3">
+                        <td class="py-3 border-bottom-subtle">
                             <div class="fw-bold text-dark">{{ $usuario->name }}</div>
                             <div class="text-muted small">
                                 <i class="bi bi-envelope-at me-1"></i>{{ $usuario->email }}
@@ -94,19 +92,19 @@
                         </td>
 
                         {{-- DNI --}}
-                        <td class="py-3">
+                        <td class="py-3 border-bottom-subtle">
                             <span class="font-monospace text-muted small bg-light px-2 py-1 rounded border">
                                 {{ $usuario->dni ?? '---' }}
                             </span>
                         </td>
 
                         {{-- EDAD --}}
-                        <td class="py-3 text-center text-muted">
+                        <td class="py-3 text-center text-muted border-bottom-subtle">
                             {{ $usuario->edad ? $usuario->edad . ' años' : '---' }}
                         </td>
 
                         {{-- ROL --}}
-                        <td class="py-3">
+                        <td class="py-3 border-bottom-subtle">
                             @if($usuario->rol === 'admin')
                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">
                                 <i class="bi bi-shield-lock-fill me-1"></i>Admin
@@ -118,19 +116,19 @@
                             @endif
                         </td>
 
-                        {{-- ACCIONES --}}
-                        <td class="text-end py-3">
-                            <div class="btn-group shadow-sm" role="group">
-                                <a href="{{ route('usuarios.show', $usuario->id) }}" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                        {{-- ACCIONES CÁPSULA --}}
+                        <td class="text-end py-4 pe-4 border-bottom-subtle">
+                            <div class="d-inline-flex bg-light border border-secondary-subtle rounded-pill p-1 shadow-sm-inner">
+                                <a href="{{ route('usuarios.show', $usuario->id) }}" class="btn btn-sm rounded-circle text-primary btn-action-hover" title="Ver detalles">
                                     <i class="bi bi-eye-fill"></i>
                                 </a>
-                                <a href="{{ route('usuarios.edit', $usuario->id) }}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <a href="{{ route('usuarios.edit', $usuario->id) }}" class="btn btn-sm rounded-circle text-secondary btn-action-hover mx-1" title="Editar">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <form action="{{ route('usuarios.destroy', $usuario->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+                                <form action="{{ route('usuarios.destroy', $usuario->id) }}" method="POST" class="d-inline m-0" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" {{ auth()->id() === $usuario->id ? 'disabled' : '' }}>
+                                    <button type="submit" class="btn btn-sm rounded-circle text-danger btn-action-hover" title="Eliminar" {{ auth()->id() === $usuario->id ? 'disabled' : '' }}>
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </form>
@@ -142,8 +140,15 @@
             </table>
         </div>
 
-        <div class="mt-4 d-flex justify-content-end">
-            {{ $usuarios->appends(request()->query())->links('pagination::bootstrap-5') }}
+        {{-- PAGINACIÓN DETALLADA --}}
+        <div class="mt-5 mb-2 d-flex flex-column flex-md-row justify-content-between align-items-center gap-4 custom-pagination">
+            <div class="text-muted small bg-light px-3 py-2 rounded-pill border border-neutral-100 shadow-sm-inner">
+                Mostrando del <span class="fw-bold text-dark">{{ $usuarios->firstItem() ?? 0 }}</span> al <span class="fw-bold text-dark">{{ $usuarios->lastItem() ?? 0 }}</span> de <span class="fw-bold text-primary">{{ $usuarios->total() ?? 0 }}</span> resultados
+            </div>
+
+            <div class="pagination-wrapper">
+                {{ $usuarios->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
         </div>
 
         @else
@@ -158,4 +163,91 @@
         @endif
     </div>
 </div>
+
+<style>
+    /* Estilos para las acciones */
+    .border-bottom-subtle {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .shadow-sm-inner {
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .btn-action-hover {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .btn-action-hover:hover:not(:disabled) {
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .btn-action-hover:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Estilos de la Paginación */
+    .custom-pagination nav>div.d-flex.justify-content-between.flex-fill.d-sm-none {
+        display: none !important;
+    }
+
+    .custom-pagination nav>div.d-none.flex-sm-fill.d-sm-flex>div:first-child {
+        display: none !important;
+    }
+
+    .pagination-wrapper {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .custom-pagination .pagination {
+        margin-bottom: 0;
+        gap: 5px;
+        border: none;
+    }
+
+    .custom-pagination .page-item:first-child .page-link,
+    .custom-pagination .page-item:last-child .page-link {
+        border-radius: 50px;
+    }
+
+    .custom-pagination .page-link {
+        border-radius: 50px;
+        color: #475569;
+        background-color: transparent;
+        border: 1px solid #e2e8f0;
+        padding: 0.45rem 0.9rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .custom-pagination .page-item.active .page-link {
+        color: white;
+        background-color: var(--bs-primary, #0d6efd);
+        border-color: var(--bs-primary, #0d6efd);
+        box-shadow: 0 2px 5px rgba(13, 110, 253, 0.2);
+    }
+
+    .custom-pagination .page-item.disabled .page-link {
+        color: #cbd5e1;
+        background-color: transparent;
+        border-color: #e2e8f0;
+        opacity: 0.6;
+    }
+
+    .custom-pagination .page-link:hover:not(.active):not(.disabled) {
+        color: var(--bs-primary, #0d6efd);
+        background-color: rgba(13, 110, 253, 0.05);
+        border-color: #bfdbfe;
+    }
+</style>
 @endsection

@@ -12,13 +12,13 @@ class UserController extends Controller
 {
     public function index()
     {
-        // Añadimos withCount para saber cuántos libros tiene cada uno en su casa AHORA
+        // Añadimos withCount para saber cuántos libros tiene cada uno en su casa
         $query = \App\Models\User::where('rol', '!=', 'admin')
             ->withCount(['prestamos' => function ($query) {
                 $query->where('estado', 'activo');
             }]);
 
-        // 1. Buscador de Texto Libre (Nombre, Email, DNI)
+        // Buscador de Texto Libre (Nombre, Email, DNI)
         $query->when(request('buscar'), function ($q, $buscar) {
             $q->where(function ($q2) use ($buscar) {
                 $q2->where('name', 'like', "%{$buscar}%")
@@ -27,15 +27,13 @@ class UserController extends Controller
             });
         });
 
-        // 2. EL FILTRO QUE SÍ SIRVE: Estado en la Biblioteca
         $query->when(request('estado_lector') === 'con_prestamos', function ($q) {
-            // Filtra solo a los que tienen préstamos activos
+            //Filtra solo a los que tienen préstamos activos
             $q->whereHas('prestamos', function ($p) {
                 $p->where('estado', 'activo');
             });
         });
 
-        // (Opcional) Si ya tienes la relación de sanciones en el modelo User:
         $query->when(request('estado_lector') === 'sancionados', function ($q) {
             $q->whereHas('sanciones', function ($s) {
                 $s->where('fecha_fin', '>=', \Carbon\Carbon::today());
@@ -136,7 +134,6 @@ class UserController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // 🌟 LA MAGIA DE LOS ROLES 🌟
             if (Auth::user()->rol === 'admin') {
                 // Si es el bibliotecario, al panel de control
                 return redirect()->intended('/dashboard');

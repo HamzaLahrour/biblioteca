@@ -9,6 +9,7 @@ use App\Http\Requests\StoreReservaRequest;
 use App\Services\ReservaService;
 use App\Models\Reserva;
 use App\Models\Espacio;
+use App\Models\TipoEspacio;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -66,9 +67,9 @@ class ReservaController extends Controller
             ->withQueryString();
 
         // Mandamos los espacios para rellenar el `<select>` del filtro
-        $espacios = Espacio::orderBy('nombre')->get();
+        $tipos_espacios = TipoEspacio::orderBy('nombre')->get();
 
-        return view('reservas.index', compact('reservas', 'espacios'));
+        return view('reservas.index', compact('reservas', 'tipos_espacios'));
     }
 
     /**

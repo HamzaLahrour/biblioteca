@@ -1,7 +1,6 @@
 @props(['user', 'size' => '40px', 'fontSize' => '14px'])
 
 @php
-// 1. LÓGICA DE INICIALES (Mejorada)
 $nombre = $user->name ?? 'Usuario';
 $palabras = explode(' ', $nombre);
 $iniciales = '';
@@ -13,8 +12,6 @@ $iniciales = substr($nombre, 0, 2);
 }
 $iniciales = strtoupper($iniciales);
 
-// 2. PALETA DE COLORES PREMIUM (Esteroides)
-// He seleccionado combinaciones de colores con buen contraste
 $paletas = [
 ['bg' => '#4A90D9', 'text' => '#FFFFFF'], // Azul
 ['bg' => '#E67E22', 'text' => '#FFFFFF'], // Naranja
@@ -38,8 +35,7 @@ $paletas = [
 ['bg' => '#009432', 'text' => '#FFFFFF'] // Emerald
 ];
 
-// 3. ASIGNACIÓN DETERMINISTA (Mismo usuario = Mismo color siempre)
-// Usamos el ID o el Nombre para elegir un color del array
+
 $index = (crc32($user->email ?? $user->name) % count($paletas));
 $colorFondo = $paletas[$index]['bg'];
 $colorTexto = $paletas[$index]['text'];

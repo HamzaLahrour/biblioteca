@@ -15,38 +15,36 @@ class DashboardController extends Controller
     {
         $hoy = Carbon::today();
 
-        // --- Métricas base (igual que antes) ---
         $totalLibros      = Libro::count();
         $totalUsuarios    = User::where('rol', '!=', 'admin')->count();
         $prestamosActivos = Prestamo::where('estado', 'activo')->count();
         $reservasHoyCount = Reserva::whereDate('fecha_reserva', $hoy)->count();
 
-        // --- NUEVO: contexto para las tarjetas métricas ---
+        // préstamos que ya han pasado su fecha límite y siguen sin devolver
         $prestamosVencidos = Prestamo::where('estado', '!=', 'devuelto')
             ->whereDate('fecha_devolucion_prevista', '<', $hoy)
             ->count();
 
+        // préstamos que vencen en los próximos 3 días
         $prestamosProximos = Prestamo::where('estado', '!=', 'devuelto')
             ->whereDate('fecha_devolucion_prevista', '>=', $hoy)
             ->whereDate('fecha_devolucion_prevista', '<=', $hoy->copy()->addDays(3))
             ->count();
 
-        // Lectores que tienen préstamo activo ahora mismo
         $lectoresConPrestamo = User::where('rol', '!=', 'admin')
             ->whereHas('prestamos', fn($q) => $q->where('estado', 'activo'))
             ->count();
-        // --- Reservas de hoy (igual que antes, sirve también para el aforo agrupado) ---
+
         $reservasHoy = Reserva::with(['user', 'espacio'])
             ->whereDate('fecha_reserva', $hoy)
             ->orderBy('hora_inicio', 'asc')
             ->get();
 
-        // Próxima reserva del día (para subtext de la tarjeta)
+        // la siguiente reserva que aún no ha empezado
         $proximaReserva = $reservasHoy
             ->where('hora_inicio', '>=', Carbon::now()->format('H:i:s'))
             ->first();
 
-        // --- Préstamos urgentes (igual que antes) ---
         $prestamosUrgentes = Prestamo::with(['user', 'libro'])
             ->where('estado', '!=', 'devuelto')
             ->whereDate('fecha_devolucion_prevista', '<=', $hoy->copy()->addDays(3))
@@ -54,13 +52,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // --- NUEVO: últimos movimientos (actividad reciente) ---
+        // últimos préstamos tocados, para el feed de actividad reciente
         $ultimosMovimientos = Prestamo::with(['user', 'libro'])
             ->latest('updated_at')
             ->take(6)
             ->get();
 
-        // --- NUEVO: libros más prestados ---
         $librosTop = Libro::withCount('prestamos')
             ->orderBy('prestamos_count', 'desc')
             ->take(5)

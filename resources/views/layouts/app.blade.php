@@ -197,7 +197,6 @@
 
 <body>
 
-    {{-- 🧭 NAVEGACIÓN SUPERIOR --}}
     <nav class="navbar navbar-expand-lg navbar-minimal sticky-top header-flotante">
         <div class="container">
 
@@ -213,7 +212,6 @@
 
             <div class="collapse navbar-collapse" id="navbarAlumno">
 
-                {{-- Enlaces Centrados con Indicadores Activos --}}
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-2 mt-3 mt-lg-0 text-center text-lg-start">
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('catalogo.*') ? 'active' : '' }}" href="{{ route('catalogo.index') }}">Catálogo</a>
@@ -226,16 +224,13 @@
                     </li>
                 </ul>
 
-                {{-- Avatar y Dropdown Inyectados con ADN --}}
                 <div class="mt-3 mt-lg-0 ms-lg-3 d-flex justify-content-center align-items-center">
                     <div class="dropdown">
 
-                        {{-- EL BOTÓN (Avatar pequeño) --}}
                         <a class="text-decoration-none dropdown-toggle d-inline-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <x-user-avatar :user="Auth::user()" size="40px" fontSize="14px" />
                         </a>
 
-                        {{-- EL MENÚ DESPLEGABLE (Alineado a la derecha en PC, centrado en móvil por CSS) --}}
                         <ul class="dropdown-menu dropdown-menu-end mt-2 p-3 border-0 shadow-lg mobile-dropdown-center" style="width: 260px;">
                             {{-- Info del Usuario --}}
                             <li class="mb-3 text-center">
@@ -270,9 +265,7 @@
         </div>
     </nav>
 
-    {{-- 📦 CONTENIDO PRINCIPAL --}}
     <main>
-        {{-- Envolvemos las alertas en un container para que NO se estiren --}}
         <div class="container mt-4">
 
             @if(session('success'))

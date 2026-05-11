@@ -14,7 +14,8 @@ use Exception;
 class ReservaService
 {
     /**
-     * Procesa y guarda una reserva aplicando todas las reglas de negocio críticas.
+     * Punto de entrada principal para crear una reserva.
+     * Pasa por todas las validaciones en orden antes de guardar nada en la BD.
      */
     public function crearReserva(array $datos, $usuarioLogueadoId)
     {
@@ -34,6 +35,7 @@ class ReservaService
         $this->validarHorarioSemanalJSON($datos['fecha'], $datos['hora_inicio'], $datos['hora_fin']);
         $this->validarFestivo($datos['fecha']);
 
+        // Todo limpio, bloqueamos el espacio y creamos la reserva dentro de una transacción
         return DB::transaction(function () use ($datos, $userId) {
 
             $espacio = Espacio::lockForUpdate()->findOrFail($datos['espacio_id']);
@@ -52,6 +54,11 @@ class ReservaService
         });
     }
 
+    /**
+     * Cuando el usuario no elige espacio concreto, buscamos uno libre automáticamente.
+     * Primero valida todas las reglas del usuario y luego va probando espacios uno a uno
+     * hasta encontrar alguno que no choque con nada.
+     */
     public function buscarEspacioDisponible($tipoEspacioId, array $datos, $usuarioLogueadoId)
     {
         $userId = $datos['user_id'] ?? $usuarioLogueadoId;
@@ -97,8 +104,15 @@ class ReservaService
         throw new Exception("No quedan espacios disponibles en el horario y fecha seleccionados.");
     }
 
-    // --- FUNCIONES PRIVADAS (Usando tu método Configuracion::get) ---
+    // =========================================================================
+    // VALIDACIONES PRIVADAS
+    // =========================================================================
 
+    /**
+     * Comprueba el horario semanal guardado en configuración (JSON).
+     * Verifica que el día esté abierto, que la reserva entre dentro del horario
+     * y que termine antes del margen de desalojo previo al cierre.
+     */
     private function validarHorarioSemanalJSON($fecha, $horaInicio, $horaFin)
     {
         $horarioJson = Configuracion::get('horario_semanal');
@@ -130,12 +144,13 @@ class ReservaService
             throw new Exception("La biblioteca permanece cerrada los " . ucfirst($nombreDia) . "s.");
         }
 
-        // Función para convertir la hora en minutos transcurridos desde medianoche
+        // Convierte una hora a minutos desde medianoche.
+        // Si es hora de cierre y llega "00:00", lo tratamos como fin de día (1440 min).
         $toMinutos = function ($hora, $esCierre = false) {
             $parsed = Carbon::parse($hora);
             $minutos = $parsed->hour * 60 + $parsed->minute;
 
-            // SOLO si es una hora de cierre/fin y marca "00:00", asumimos que es el final del día (1440 min)
+            // Solo si es una hora de cierre/fin y marca "00:00", asumimos que es el final del día (1440 min)
             if ($esCierre && $minutos === 0) {
                 return 1440;
             }
@@ -153,7 +168,7 @@ class ReservaService
 
         // 1. Validar que la reserva esté dentro del horario de apertura general
         if ($inicioReserva < $apertura || $finReserva > $cierre) {
-            throw new Exception("El horario de los " . ucfirst($nombreDia) . "s es de {$aperturaStr} a {$cierreStr}.");
+            throw new Exception("El horario de los " . ucfirst($nombreDia) . " es de {$aperturaStr} a {$cierreStr}.");
         }
 
         // 2. Aplicar margen de desalojo antes del cierre (ej: 15 minutos)
@@ -170,6 +185,10 @@ class ReservaService
         }
     }
 
+    /**
+     * Evita que alguien intente reservar una hora que ya pasó.
+     * Usa la zona horaria de Madrid para no tener problemas con el servidor.
+     */
     private function validarHoraNoPasada($fecha, $horaInicio)
     {
         $fechaHoraReserva = Carbon::createFromFormat(
@@ -183,10 +202,10 @@ class ReservaService
         }
     }
 
-
-
-
-
+    /**
+     * Comprueba que la reserva dure entre el mínimo y máximo de minutos
+     * configurados en el panel (por defecto entre 30 y 180 minutos).
+     */
     private function validarDuracion($horaInicio, $horaFin)
     {
         $duracionMinima = Configuracion::get('duracion_minima', 30);
@@ -202,6 +221,9 @@ class ReservaService
         }
     }
 
+    /**
+     * Si el usuario tiene una sanción vigente hoy o en el futuro, le bloqueamos la reserva.
+     */
     private function validarSanciones($userId)
     {
         $usuario = User::find($userId);
@@ -212,6 +234,10 @@ class ReservaService
         }
     }
 
+    /**
+     * Comprueba que el usuario no supere el número máximo de reservas activas
+     * permitidas simultáneamente (solo cuenta las que todavía no han pasado).
+     */
     private function validarLimiteReservas($userId)
     {
         $maximaReserva = Configuracion::get('max_reservas_activas', 2);
@@ -232,11 +258,14 @@ class ReservaService
         }
     }
 
+    /**
+     * Suma todos los minutos reservados por el usuario en ese día
+     * y comprueba que la nueva reserva no supere el máximo diario configurado.
+     */
     private function validarHorasDiarias($userId, $fecha, $horaInicio, $horaFin)
     {
         $minutosMaximos = Configuracion::get('max_horas_diarias', 360);
 
-        // CORRECCIÓN: 'fecha_reserva'
         $reservasHoy = Reserva::where('user_id', $userId)
             ->where('fecha_reserva', $fecha)
             ->where('estado', 'activa')
@@ -255,9 +284,12 @@ class ReservaService
         }
     }
 
+    /**
+     * Evita que el mismo usuario tenga dos reservas activas que se pisen en el tiempo,
+     * independientemente del espacio. No puedes estar en dos sitios a la vez.
+     */
     private function validarSolapamientoUsuario($userId, $fecha, $horaInicio, $horaFin)
     {
-        // CORRECCIÓN: 'fecha_reserva'
         $solapamiento = Reserva::where('user_id', $userId)
             ->whereDate('fecha_reserva', $fecha)
             ->where('hora_inicio', '<', $horaFin)
@@ -270,6 +302,9 @@ class ReservaService
         }
     }
 
+    /**
+     * Verifica que el espacio exista, esté disponible y tenga capacidad mayor que cero.
+     */
     private function validarEspacioActivoYCapacidad($espacioId)
     {
         $espacio = Espacio::find($espacioId);
@@ -281,13 +316,16 @@ class ReservaService
         }
     }
 
+    /**
+     * Añade un margen de limpieza (configurable, por defecto 15 min) antes y después
+     * de cada reserva existente, y comprueba que la nueva no choque con ese margen.
+     */
     private function validarBufferLimpieza($espacioId, $fecha, $horaInicio, $horaFin)
     {
         $antelacion = Configuracion::get('buffer_limpieza', 15);
         $inicioExpandido = Carbon::createFromTimeString($horaInicio)->subMinutes($antelacion)->format('H:i:s');
         $finExpandido = Carbon::createFromTimeString($horaFin)->addMinutes($antelacion)->format('H:i:s');
 
-        // CORRECCIÓN: 'fecha_reserva'
         $hayChoque = Reserva::where('espacio_id', $espacioId)
             ->where('fecha_reserva', $fecha)
             ->where('estado', 'activa') // Añadido para ignorar canceladas
@@ -300,9 +338,12 @@ class ReservaService
         }
     }
 
+    /**
+     * Comprueba que el número de reservas activas en ese espacio y franja horaria
+     * no haya alcanzado ya la capacidad máxima del espacio.
+     */
     private function validarDisponibilidadReal($espacio, $fecha, $horaInicio, $horaFin)
     {
-        // CORRECCIÓN: 'fecha_reserva'
         $numeroSolapamiento = Reserva::where('espacio_id', $espacio->id)
             ->where('fecha_reserva', $fecha)
             ->where('estado', 'activa')
@@ -315,6 +356,10 @@ class ReservaService
         }
     }
 
+    /**
+     * Solo los admins pueden reservar en nombre de otro usuario.
+     * Si el user_id del formulario no coincide con el logueado, se comprueba el rol.
+     */
     private function validarPermisoUsuario($userIdFormulario, $usuarioLogueadoId)
     {
         if ($userIdFormulario && $userIdFormulario != $usuarioLogueadoId) {
@@ -325,10 +370,8 @@ class ReservaService
         }
     }
 
-
-
     /**
-     * Separamos la validación de los festivos para que quede limpia
+     * Consulta la tabla de festivos y lanza excepción si la fecha elegida está marcada como festivo.
      */
     private function validarFestivo($fecha)
     {
@@ -338,12 +381,13 @@ class ReservaService
         }
     }
 
+    /**
+     * Impide reservar con menos antelación de la mínima configurada (por defecto 30 minutos).
+     */
     private function validarAntelacionMinima($fecha, $horaInicio)
     {
-        // Usamos TU clave original (30 minutos por defecto)
         $minutosMinimos = (int) Configuracion::get('antelacion_minima', 30);
 
-        // Forzamos la zona horaria para evitar sustos con el servidor
         $inicioReserva = Carbon::parse($fecha . ' ' . $horaInicio, 'Europe/Madrid');
         $limiteMinimo = now('Europe/Madrid')->addMinutes($minutosMinimos);
 
@@ -353,11 +397,11 @@ class ReservaService
     }
 
     /**
-     * Valida que el usuario no acapare salas para dentro de 3 meses (Margen máximo a futuro)
+     * Impide reservar con demasiada antelación para evitar que alguien acapare espacios
+     * semanas o meses por adelantado. El límite en días se configura desde el panel.
      */
     private function validarAntelacionMaxima($fecha)
     {
-        // Leemos tu nueva configuración (por defecto 7 días si falla la BD)
         $diasMaximos = (int) Configuracion::get('dias_maximos_reserva', 7);
 
         $inicioReserva = Carbon::parse($fecha);
