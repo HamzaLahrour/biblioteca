@@ -34,7 +34,6 @@
                 </div>
 
                 <div class="col-md-2 d-flex gap-2">
-                    {{-- Botón Filtrar ahora es azul (btn-primary) --}}
                     <button type="submit" class="btn btn-sm btn-primary w-100 fw-medium shadow-sm">Filtrar</button>
                     @if(request()->anyFilled(['buscar', 'estado_lector']))
                     <a href="{{ route('usuarios.index') }}" class="btn btn-sm btn-outline-secondary" title="Limpiar"><i class="bi bi-x-lg"></i></a>
@@ -59,28 +58,14 @@
                 <tbody class="border-top-0">
                     @foreach($usuarios as $usuario)
                     <tr>
-                        {{-- AVATAR --}}
                         <td class="py-3 text-center border-bottom-subtle">
                             @if($usuario->rol === 'admin')
                             <i class="bi bi-person-badge-fill fs-3 text-primary"></i>
                             @else
-                            @php
-                            $palabras = explode(' ', $usuario->name);
-                            $iniciales = '';
-                            foreach ($palabras as $palabra) {
-                            if(!empty($palabra)) $iniciales .= strtoupper($palabra[0]);
-                            }
-                            $iniciales = substr($iniciales, 0, 2);
-                            $colores = ['#4A90D9', '#E67E22', '#2ECC71', '#9B59B6', '#E74C3C', '#1ABC9C', '#F39C12', '#3498DB'];
-                            $color = $colores[ord(strtoupper($usuario->name[0] ?? 'U')) % count($colores)];
-                            @endphp
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: {{ $color }}; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: white; margin: 0 auto;">
-                                {{ $iniciales }}
-                            </div>
+                            <x-user-avatar :user="$usuario" class="mx-auto" />
                             @endif
                         </td>
 
-                        {{-- NOMBRE Y CONTACTO --}}
                         <td class="py-3 border-bottom-subtle">
                             <div class="fw-bold text-dark">{{ $usuario->name }}</div>
                             <div class="text-muted small">
@@ -91,19 +76,16 @@
                             </div>
                         </td>
 
-                        {{-- DNI --}}
                         <td class="py-3 border-bottom-subtle">
                             <span class="font-monospace text-muted small bg-light px-2 py-1 rounded border">
                                 {{ $usuario->dni ?? '---' }}
                             </span>
                         </td>
 
-                        {{-- EDAD --}}
                         <td class="py-3 text-center text-muted border-bottom-subtle">
                             {{ $usuario->edad ? $usuario->edad . ' años' : '---' }}
                         </td>
 
-                        {{-- ROL --}}
                         <td class="py-3 border-bottom-subtle">
                             @if($usuario->rol === 'admin')
                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">
@@ -116,7 +98,6 @@
                             @endif
                         </td>
 
-                        {{-- ACCIONES CÁPSULA --}}
                         <td class="text-end py-4 pe-4 border-bottom-subtle">
                             <div class="d-inline-flex bg-light border border-secondary-subtle rounded-pill p-1 shadow-sm-inner">
                                 <a href="{{ route('usuarios.show', $usuario->id) }}" class="btn btn-sm rounded-circle text-primary btn-action-hover" title="Ver detalles">
@@ -140,7 +121,6 @@
             </table>
         </div>
 
-        {{-- PAGINACIÓN DETALLADA --}}
         <div class="mt-5 mb-2 d-flex flex-column flex-md-row justify-content-between align-items-center gap-4 custom-pagination">
             <div class="text-muted small bg-light px-3 py-2 rounded-pill border border-neutral-100 shadow-sm-inner">
                 Mostrando del <span class="fw-bold text-dark">{{ $usuarios->firstItem() ?? 0 }}</span> al <span class="fw-bold text-dark">{{ $usuarios->lastItem() ?? 0 }}</span> de <span class="fw-bold text-primary">{{ $usuarios->total() ?? 0 }}</span> resultados
@@ -165,7 +145,6 @@
 </div>
 
 <style>
-    /* Estilos para las acciones */
     .border-bottom-subtle {
         border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
     }
@@ -194,7 +173,6 @@
         cursor: not-allowed;
     }
 
-    /* Estilos de la Paginación */
     .custom-pagination nav>div.d-flex.justify-content-between.flex-fill.d-sm-none {
         display: none !important;
     }

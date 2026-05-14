@@ -103,9 +103,7 @@
                             {{-- LECTOR --}}
                             <td class="py-3 border-bottom-subtle">
                                 <div class="d-flex align-items-center">
-                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3 fw-bold" style="width: 40px; height: 40px;">
-                                        {{ strtoupper(substr($prestamo->user->nombre ?? 'U', 0, 1)) }}
-                                    </div>
+                                    <x-user-avatar :user="$prestamo->user" class="me-3" />
                                     <div>
                                         <span class="d-block fw-bold text-dark">{{ $prestamo->user->name ?? 'Usuario Eliminado' }}</span>
                                         <span class="d-block small text-muted">{{ $prestamo->user->email ?? 'N/A' }}</span>
