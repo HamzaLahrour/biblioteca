@@ -177,6 +177,15 @@
             color: var(--primary-blue-dark);
         }
 
+        .input-wrapper .form-control.is-invalid {
+            padding-right: 70px !important;
+        }
+
+        /* 2. Desplaza el ojito a la izquierda SOLO cuando hay error (cuando existe el icono rojo) */
+        .input-wrapper .form-control.is-invalid+.toggle-password {
+            right: 40px;
+        }
+
         /* Fila "recordarme" + "olvidé contraseña" */
         .form-extras {
             display: flex;
@@ -497,42 +506,26 @@
            ============================================ */
         @media (max-width: 768px) {
             .auth-shell {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
+                display: block;
+                /* Quitamos el grid */
+                min-height: 100vh;
+                background-color: var(--white);
             }
 
             .auth-image-panel {
-                min-height: 240px;
-                padding: 2rem 1.5rem;
-                justify-content: flex-end;
-                box-shadow: inset 0 -4px 0 0 var(--primary-blue);
-            }
-
-            .image-badge {
-                margin-bottom: 0.75rem;
-            }
-
-            .image-quote {
-                font-size: 22px;
-                padding-left: 1rem;
-                margin-bottom: 0;
-            }
-
-            .image-quote::before {
-                width: 3px;
-            }
-
-            .image-subtext,
-            .image-features {
                 display: none;
+                /* Ocultamos la imagen para no distraer */
             }
 
             .auth-form-panel {
-                padding: 2rem 1.25rem 3rem;
+                min-height: 100vh;
+                padding: 2rem 1.5rem;
+                justify-content: center;
+                /* Centramos el login perfectamente */
             }
 
             .logo-container {
-                margin-bottom: 1.75rem;
+                margin-bottom: 2rem;
             }
 
             .logo-container img {
@@ -610,7 +603,7 @@
                             <input class="form-check-input" type="checkbox" name="remember" id="remember">
                             <label class="form-check-label" for="remember">Recordarme</label>
                         </div>
-                        <a href="#">¿Olvidaste tu contraseña?</a>
+                        <a href="{{ route('password.info') }}">¿Olvidaste tu contraseña?</a>
                     </div>
 
                     <button type="submit" class="btn btn-primary">
@@ -620,7 +613,7 @@
                 </form>
 
                 <p class="form-footer">
-                    ¿Aún no tienes cuenta? <a href="#">Solicitar acceso</a>
+                    ¿Aún no tienes cuenta? <a href="{{ route('register.info') }}">Solicitar acceso</a>
                 </p>
 
             </div>

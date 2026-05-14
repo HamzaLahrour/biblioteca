@@ -24,15 +24,28 @@ class UpdateCategoriaRequest extends FormRequest
     public function rules(): array
     {
         $categoriaId = $this->route('categoria')->id;
-        
+
         return [
             'nombre' => [
-                'required', 
-                'string', 
-                'max:255', 
+                'required',
+                'string',
+                'max:90',
                 Rule::unique('categorias', 'nombre')->ignore($categoriaId)
             ],
             'descripcion' => ['nullable', 'string'],
+        ];
+    }
+
+
+    public function messages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre de la categoría es obligatorio.',
+            'nombre.string'   => 'El nombre debe ser un texto válido.',
+            'nombre.max'      => 'El nombre no puede superar los :max caracteres.',
+            'nombre.unique'   => 'Ya existe una categoría con ese nombre.',
+
+            'descripcion.string' => 'La descripción debe ser un texto válido.',
         ];
     }
 }

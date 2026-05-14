@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-
 class StoreEspacioRequest extends FormRequest
 {
     /**
@@ -15,8 +14,6 @@ class StoreEspacioRequest extends FormRequest
     {
         return true;
     }
-
-
 
     protected function prepareForValidation()
     {
@@ -54,12 +51,13 @@ class StoreEspacioRequest extends FormRequest
             'ubicacion' => [
                 'required',
                 'string',
-                'max:255'
+                'max:100'
             ],
             'capacidad' => [
                 'required',
                 'integer',
-                'min:1'
+                'min:1',
+                'max:150'
             ],
             'tipo_espacio_id' => [
                 'required',
@@ -75,23 +73,39 @@ class StoreEspacioRequest extends FormRequest
     public function messages(): array
     {
         return [
+            // Nombre
             'nombre.required'          => 'El nombre del espacio es obligatorio.',
+            'nombre.string'            => 'El nombre debe ser un texto válido.',
             'nombre.min'               => 'El nombre debe tener al menos 2 caracteres.',
+            'nombre.max'               => 'El nombre no puede superar los 255 caracteres.',
             'nombre.regex'             => 'El nombre debe contener al menos una letra. No puede estar formado solo por números.',
             'nombre.unique'            => 'Ese nombre de espacio ya está en uso. Elige otro para evitar confusiones.',
 
+            // Código
             'codigo.required'          => 'El código es obligatorio.',
+            'codigo.string'            => 'El código debe ser una cadena de texto.',
+            'codigo.min'               => 'El código debe tener al menos 2 caracteres.',
+            'codigo.max'               => 'El código no puede superar los 20 caracteres.', // Corrige validation.max.string de la imagen
             'codigo.regex'             => 'El código solo puede contener letras, números, guiones y guiones bajos. Sin espacios.',
             'codigo.unique'            => 'Este código ya está en uso. Elige otro.',
 
+            // Ubicación
             'ubicacion.required'       => 'La ubicación es obligatoria.',
+            'ubicacion.string'         => 'La ubicación debe ser un texto válido.',
+            'ubicacion.max'            => 'La ubicación no puede superar los 255 caracteres.',
 
+            // Capacidad
             'capacidad.required'       => 'Debes indicar la capacidad del espacio.',
+            'capacidad.integer'        => 'La capacidad debe ser un número entero (sin decimales ni letras).', // Corrige validation.integer de la imagen
             'capacidad.min'            => 'La capacidad debe ser al menos de 1 persona.',
+            'capacidad.max'            => 'La capacidad máxima es de 150 personas.',
 
+            // Tipo Espacio
             'tipo_espacio_id.required' => 'Debes seleccionar una clasificación para el espacio.',
             'tipo_espacio_id.exists'   => 'La clasificación seleccionada no es válida.',
 
+            // Disponible
+            'disponible.boolean'       => 'El valor de disponibilidad no es válido.',
         ];
     }
 }

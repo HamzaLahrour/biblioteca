@@ -40,8 +40,10 @@ class ReservaController extends Controller
         }
 
         // 2. Filtrar por Espacio
-        if ($request->filled('espacio_id')) {
-            $query->where('espacio_id', $request->espacio_id);
+        if ($request->filled('tipo_espacio_id')) {
+            $query->whereHas('espacio', function ($q) use ($request) {
+                $q->where('tipo_espacio_id', $request->tipo_espacio_id);
+            });
         }
 
         // 3. Filtrar por Rango de Fechas

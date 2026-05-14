@@ -17,9 +17,7 @@
                 <h4 class="fw-bold text-dark mb-0">
                     <i class="bi bi-person-vcard me-2 text-primary"></i>Ficha del Usuario
                 </h4>
-                <span class="badge bg-secondary rounded-pill px-3 py-2 shadow-sm">
-                    ID: {{ substr($usuario->id, 0, 8) }}...
-                </span>
+
             </div>
 
             <div class="card-body p-4">
@@ -138,10 +136,19 @@
                                         <td>{{ \Carbon\Carbon::parse($prestamo->fecha_prestamo)->format('d/m/Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($prestamo->fecha_devolucion)->format('d/m/Y') }}</td>
                                         <td>
-                                            @if($prestamo->devuelto)
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle">Devuelto</span>
+                                            @if($prestamo->estado === 'activo')
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                                Activo
+                                            </span>
+                                            @elseif($prestamo->estado === 'devuelto')
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                                Devuelto
+                                            </span>
+
                                             @else
-                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Activo</span>
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                                Perdido
+                                            </span>
                                             @endif
                                         </td>
                                     </tr>
@@ -194,7 +201,7 @@
                             <table class="table table-hover align-middle border">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Motivo</th>
+
                                         <th>Fecha Inicio</th>
                                         <th>Fecha Fin</th>
                                         <th>Estado</th>
@@ -203,8 +210,6 @@
                                 <tbody>
                                     @forelse($usuario->sanciones as $sancion)
                                     <tr>
-                                        <!-- Adapta los campos de sanción según tu DB -->
-                                        <td class="fw-medium text-danger">{{ $sancion->motivo }}</td>
                                         <td>{{ \Carbon\Carbon::parse($sancion->fecha_inicio)->format('d/m/Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($sancion->fecha_fin)->format('d/m/Y') }}</td>
                                         <td>

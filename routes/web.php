@@ -19,6 +19,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Rutas de información para el acceso
+Route::view('/recuperar-acceso', 'auth.info-password')->name('password.info');
+Route::view('/solicitar-cuenta', 'auth.info-register')->name('register.info');
+
 Route::prefix('usuarios')->group(function () {
     Route::get('/login', [UserController::class, 'login'])->name('login');
     Route::post('/login', [UserController::class, 'authenticate'])->name('usuarios.authenticate')->middleware('throttle:5,1');

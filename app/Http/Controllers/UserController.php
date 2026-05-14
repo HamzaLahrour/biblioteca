@@ -129,9 +129,15 @@ class UserController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email'    => 'Debes introducir un formato de correo válido.',
+            'password.required' => 'La contraseña es obligatoria.',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
             if (Auth::user()->rol === 'admin') {

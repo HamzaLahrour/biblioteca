@@ -65,7 +65,8 @@ class UpdateEspacioRequest extends FormRequest
             'capacidad' => [
                 'required',
                 'integer',
-                'min:1'
+                'min:1',
+                'max:150'
             ],
             'tipo_espacio_id' => [
                 'required',
@@ -94,6 +95,7 @@ class UpdateEspacioRequest extends FormRequest
 
             'capacidad.required'       => 'Debes indicar la capacidad del espacio.',
             'capacidad.min'            => 'La capacidad debe ser al menos de 1 persona.',
+            'capacidad.max'            => 'La capacidad maxima es de 150.',
 
             'tipo_espacio_id.required' => 'Debes seleccionar un tipo.',
             'tipo_espacio_id.exists'   => 'La clasificación seleccionada no es válida.',

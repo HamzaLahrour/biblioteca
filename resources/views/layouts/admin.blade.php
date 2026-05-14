@@ -12,17 +12,11 @@
     <style>
         :root {
             --primary: #1E90FF;
-            /* Azul Dodger */
             --secondary-dark: #0D47A1;
-            /* Azul Oscuro */
             --secondary-light: #64B5F6;
-            /* Azul Claro */
             --text-main: #212121;
-            /* Gris Oscuro */
             --text-muted: #757575;
-            /* Gris Medio */
             --bg-light: #F5F5F5;
-            /* Gris Claro */
 
             --color-exito: #4CAF50;
             --color-alerta: #FF9800;
@@ -36,11 +30,32 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
-        /* Sidebar Limpio y Blanco */
+        /* Sidebar Contenedor Principal */
         .sidebar {
-            min-height: 100vh;
+            height: 100vh;
+            position: sticky;
+            top: 0;
             background-color: #ffffff;
             border-right: 1px solid #e0e0e0;
+            z-index: 100;
+        }
+
+        /* Contenedor interno para arreglar el Flexbox y el scroll */
+        .sidebar-inner {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar limpio para el menú */
+        .sidebar-inner::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar-inner::-webkit-scrollbar-thumb {
+            background-color: #e0e0e0;
+            border-radius: 10px;
         }
 
         .sidebar .nav-link {
@@ -85,7 +100,7 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-        /* Botones Globales adaptados a tu paleta */
+        /* Botones Globales */
         .btn-primary {
             background-color: var(--primary);
             border-color: var(--primary);
@@ -103,81 +118,98 @@
     <div class="container-fluid">
         <div class="row">
 
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse px-3">
-                <div class="position-sticky pt-3">
+            {{-- Le quitamos el padding al nav y se lo damos al div interno --}}
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse px-0">
 
-                    <a href="{{ route('dashboard') ?? '#' }}" class="d-flex justify-content-center align-items-center mb-5 mt-4 text-decoration-none px-2 logo-container">
-                        <img src="{{ asset('img/logolibrelah.png') }}" alt="Logo LibreLah"
-                            style="max-height: 120px; width: auto; max-width: 100%; object-fit: contain;"
-                            class="img-fluid p-2">
-                    </a>
+                {{-- MAGIA AQUI: Este div controla el alto total y empuja el final hacia abajo --}}
+                <div class="sidebar-inner px-3">
 
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard')}}" class="nav-link active">
-                                <i class="bi bi-grid-1x2"></i> Panel de Control
-                            </a>
-                        </li>
+                    <div class="pt-3 flex-grow-1">
+                        <a href="{{ route('dashboard') ?? '#' }}" class="d-flex justify-content-center align-items-center mb-5 mt-4 text-decoration-none px-2 logo-container">
+                            <img src="{{ asset('img/logolibrelah.png') }}" alt="Logo LibreLah"
+                                style="max-height: 120px; width: auto; max-width: 100%; object-fit: contain;"
+                                class="img-fluid p-2">
+                        </a>
 
-                        <h6 class="sidebar-heading">A. Catálogo</h6>
-                        <li class="nav-item">
-                            <a href="{{ route('libros.index') }}" class="nav-link">
-                                <i class="bi bi-book"></i> Libros
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('categorias.index') }}" class="nav-link">
-                                <i class="bi bi-tags"></i> Categorías
-                            </a>
-                        </li>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                                    <i class="bi bi-grid-1x2"></i> Panel de Control
+                                </a>
+                            </li>
 
-                        <h6 class="sidebar-heading">B. Usuarios</h6>
-                        <li class="nav-item">
-                            <a href="{{ route('usuarios.index') }}" class="nav-link">
-                                <i class="bi bi-person-plus"></i> Gestion de Usuarios
-                            </a>
-                        </li>
+                            <h6 class="sidebar-heading">A. Catálogo</h6>
+                            <li class="nav-item">
+                                <a href="{{ route('libros.index') }}" class="nav-link">
+                                    <i class="bi bi-book"></i> Libros
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('categorias.index') }}" class="nav-link">
+                                    <i class="bi bi-tags"></i> Categorías
+                                </a>
+                            </li>
 
-                        <h6 class="sidebar-heading">C. Préstamos</h6>
-                        <li class="nav-item">
-                            <a href="{{ route('prestamos.index') }}" class="nav-link">
-                                <i class="bi bi-arrow-left-right"></i> Gestion de Prestamos
-                            </a>
-                        </li>
+                            <h6 class="sidebar-heading">B. Usuarios</h6>
+                            <li class="nav-item">
+                                <a href="{{ route('usuarios.index') }}" class="nav-link">
+                                    <i class="bi bi-person-plus"></i> Gestion de Usuarios
+                                </a>
+                            </li>
 
-                        <h6 class="sidebar-heading">D. Espacios</h6>
-                        <li class="nav-item">
-                            <a href="{{ route('tipos_espacios.index') }}" class="nav-link">
-                                <i class="bi bi-geo-alt"></i> Gestión de Tipos de Espacios
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('espacios.index') }}" class="nav-link">
-                                <i class="bi bi-geo-alt"></i> Gestión de Espacios
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('reservas.index') }}" class="nav-link">
-                                <i class="bi bi-calendar-check"></i> Reservas Activas
-                            </a>
-                        </li>
+                            <h6 class="sidebar-heading">C. Préstamos</h6>
+                            <li class="nav-item">
+                                <a href="{{ route('prestamos.index') }}" class="nav-link">
+                                    <i class="bi bi-arrow-left-right"></i> Gestion de Prestamos
+                                </a>
+                            </li>
 
+                            <h6 class="sidebar-heading">D. Espacios</h6>
+                            <li class="nav-item">
+                                <a href="{{ route('tipos_espacios.index') }}" class="nav-link">
+                                    <i class="bi bi-geo-alt"></i> Gestión de Tipos de Espacios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('espacios.index') }}" class="nav-link">
+                                    <i class="bi bi-geo-alt"></i> Gestión de Espacios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('reservas.index') }}" class="nav-link">
+                                    <i class="bi bi-calendar-check"></i> Reservas Activas
+                                </a>
+                            </li>
 
+                            <h6 class="sidebar-heading">E. Ajustes</h6>
+                            <li class="nav-item">
+                                <a href="{{ route('configuracion.edit') }}" class="nav-link {{ request()->routeIs('configuracion.*') ? 'active bg-primary-subtle text-primary fw-bold rounded' : '' }}">
+                                    <i class="bi bi-gear-fill me-2"></i> Configuración General
+                                </a>
+                            </li>
 
-                        <h6 class="sidebar-heading">F. Ajustes</h6>
-                        <li class="nav-item">
-                            <a href="{{ route('configuracion.edit') }}" class="nav-link {{ request()->routeIs('configuracion.*') ? 'active bg-primary-subtle text-primary fw-bold rounded' : '' }}">
-                                <i class="bi bi-gear-fill me-2"></i> Configuración General
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('festivos.index') }}" class="nav-link {{ request()->routeIs('festivos.*') ? 'active' : '' }}">
+                                    <i class="bi bi-calendar-x"></i> Días Festivos
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-                        <li class="nav-item">
-                            <a href="{{ route('festivos.index') }}" class="nav-link {{ request()->routeIs('festivos.*') ? 'active' : '' }}">
-                                <i class="bi bi-calendar-x"></i> Días Festivos
-                            </a>
-                        </li>
+                    {{-- Anclado perfectamente al fondo gracias al flex-grow-1 de arriba --}}
+                    <div class="mt-auto pb-4 pt-4 border-top bg-white">
+                        <div class="text-center text-muted small mb-3 fw-medium">
+                            <i class="bi bi-info-circle me-1"></i> LibreLah v1.0
+                        </div>
 
-                    </ul>
+                        <form action="{{ route('usuarios.logout') }}" method="POST" class="d-grid gap-2 px-2">
+                            @csrf
+                            <button type="submit" class="btn btn-light btn-sm text-muted border shadow-sm py-2" title="Cerrar sesión de forma segura">
+                                <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
             </nav>
 
@@ -192,7 +224,8 @@
                     </div>
 
                     <div class="d-flex align-items-center">
-                        <div class="d-flex align-items-center me-4">
+                        {{-- Header limpio: Solo información del usuario, sin el botón de salir duplicado --}}
+                        <div class="d-flex align-items-center">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white shadow-sm" style="width: 36px; height: 36px; background-color: var(--primary);">
                                 {{ substr(Auth::user()->nombre ?? 'A', 0, 1) }}
                             </div>
@@ -201,19 +234,10 @@
                                 <small style="color: var(--text-muted); font-size: 0.8rem;">Admin</small>
                             </div>
                         </div>
-
-                        <form action="{{ route('usuarios.logout') }}" method="POST" class="m-0">
-                            @csrf
-                            <button type="submit" class="btn btn-sm" style="color: var(--text-muted); border: 1px solid #e0e0e0;">
-                                <i class="bi bi-box-arrow-right"></i> <span class="d-none d-sm-inline ms-1">Salir</span>
-                            </button>
-                        </form>
                     </div>
                 </header>
 
-                {{-- ALERTAS--}}
-
-                {{--VERDE:Éxito y confirmaciones --}}
+                {{-- ALERTAS --}}
                 @if(session('success'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-exito);" role="alert">
                     <i class="bi bi-check-circle-fill fs-5 me-2"></i>
@@ -222,7 +246,6 @@
                 </div>
                 @endif
 
-                {{--AZUL: Información general y mensajes neutros --}}
                 @if(session('info'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-info);" role="alert">
                     <i class="bi bi-info-circle-fill fs-5 me-2"></i>
@@ -231,7 +254,6 @@
                 </div>
                 @endif
 
-                {{--NARANJA: Avisos y advertencias --}}
                 @if(session('warning'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-alerta);" role="alert">
                     <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
@@ -240,7 +262,6 @@
                 </div>
                 @endif
 
-                {{--ROJO: Errores y bloqueos --}}
                 @if(session('error') || session('danger'))
                 <div class="alert text-white alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center" style="background-color: var(--color-error);" role="alert">
                     <i class="bi bi-x-octagon-fill fs-5 me-2"></i>
@@ -264,7 +285,7 @@
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });
-        }, 3500); // Se cierra a los 3.5 segundos
+        }, 3500);
     </script>
 
 </body>

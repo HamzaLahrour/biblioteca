@@ -30,7 +30,7 @@ class EspacioController extends Controller
         });
 
         // disponible es un booleano en BD, convertimos el string del filtro
-        $query->when(request()->has('estado') && request('estado') !== '', function ($q) {
+        $query->when(request()->filled('estado'), function ($q) {
             $estado = request('estado') === 'disponible' ? 1 : 0;
             $q->where('disponible', $estado);
         });

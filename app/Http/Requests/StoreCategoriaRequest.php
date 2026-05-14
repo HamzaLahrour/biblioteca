@@ -27,7 +27,7 @@ class StoreCategoriaRequest extends FormRequest
                 'required',
                 'string',
                 'min:3',
-                'max:100',
+                'max:90',
                 'regex:/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/'
             ],
             'descripcion' => ['nullable', 'string'],

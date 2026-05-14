@@ -118,7 +118,6 @@
                                 <span class="d-block fw-bold text-dark text-truncate" title="{{ $prestamo->libro->titulo ?? 'Libro Eliminado' }}">
                                     {{ $prestamo->libro->titulo ?? 'Libro Eliminado' }}
                                 </span>
-                                <span class="badge bg-light text-muted border mt-1">ID: {{ $prestamo->libro_id }}</span>
                             </td>
 
                             {{-- FECHAS --}}
