@@ -168,58 +168,6 @@ class ConfiguracionSeeder extends Seeder
                 'etiqueta'    => 'Las sanciones bloquean préstamos',
                 'descripcion' => 'Si está activo, un usuario sancionado no puede pedir préstamos.',
             ],
-
-            // ─── ACCESO ─────────────────────────────────────────────
-            [
-                'seccion'     => 'acceso',
-                'clave'       => 'edad_minima_registro',
-                'valor'       => '12',
-                'tipo'        => 'integer',
-                'etiqueta'    => 'Edad mínima para registrarse',
-                'descripcion' => 'Edad mínima que debe tener un usuario para ser registrado.',
-            ],
-            [
-                'seccion'     => 'acceso',
-                'clave'       => 'restringir_informatica',
-                'valor'       => 'false',
-                'tipo'        => 'boolean',
-                'etiqueta'    => 'Restringir zona informática por edad',
-                'descripcion' => 'Si está activo, aplica una edad mínima para reservar la zona informática.',
-            ],
-            [
-                'seccion'     => 'acceso',
-                'clave'       => 'edad_minima_informatica',
-                'valor'       => '16',
-                'tipo'        => 'integer',
-                'etiqueta'    => 'Edad mínima zona informática',
-                'descripcion' => 'Edad mínima para reservar un espacio de tipo informática.',
-            ],
-
-            // ─── GENERAL ────────────────────────────────────────────
-            [
-                'seccion'     => 'general',
-                'clave'       => 'nombre_biblioteca',
-                'valor'       => 'LibreLah',
-                'tipo'        => 'string',
-                'etiqueta'    => 'Nombre de la biblioteca',
-                'descripcion' => 'Nombre que aparece en la interfaz y documentos.',
-            ],
-            [
-                'seccion'     => 'general',
-                'clave'       => 'email_contacto',
-                'valor'       => 'biblioteca@ejemplo.com',
-                'tipo'        => 'string',
-                'etiqueta'    => 'Email de contacto',
-                'descripcion' => 'Email de contacto visible para los usuarios.',
-            ],
-            [
-                'seccion'     => 'general',
-                'clave'       => 'telefono_contacto',
-                'valor'       => '900000000',
-                'tipo'        => 'string',
-                'etiqueta'    => 'Teléfono de contacto',
-                'descripcion' => 'Teléfono de contacto visible para los usuarios.',
-            ],
         ];
 
         foreach ($configuraciones as $config) {

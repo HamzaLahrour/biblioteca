@@ -51,14 +51,12 @@ class PerfilUsuarioController extends Controller
 
     public function historialReservas()
     {
-        // Traemos TODAS las reservas del usuario, ordenadas de la más nueva a la más antigua
         $reservas = \App\Models\Reserva::with('espacio')
             ->where('user_id', \Illuminate\Support\Facades\Auth::id())
             ->orderBy('fecha_reserva', 'desc')
             ->orderBy('hora_inicio', 'desc')
-            ->paginate(10);
+            ->paginate(5);
 
-        // Asegúrate de que la carpeta de la vista coincida con donde la vayas a crear
         return view('perfil.historial_reservas', compact('reservas'));
     }
 
@@ -67,7 +65,7 @@ class PerfilUsuarioController extends Controller
         $prestamos = Prestamo::with('libro')
             ->where('user_id', auth()->id())
             ->orderBy('fecha_prestamo', 'desc')
-            ->paginate(10);
+            ->paginate(5);
 
         return view('perfil.historial_prestamos', compact('prestamos'));
     }

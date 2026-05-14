@@ -36,7 +36,7 @@ class UpdateUsuarioRequest extends FormRequest
                 'after:' . now()->subYears(120)->format('Y-m-d'),
                 'before_or_equal:' . now()->subYears(12)->format('Y-m-d'),
             ],
-            'telefono'         => 'nullable|string|max:15',
+            'telefono'         => ['required', 'regex:/^[6789][0-9]{8}$/'],
         ];
     }
 
@@ -54,6 +54,11 @@ class UpdateUsuarioRequest extends FormRequest
             'fecha_nacimiento.before'   => 'La fecha de nacimiento no puede ser futura.',
             'fecha_nacimiento.before_or_equal' => 'El usuario debe tener al menos 12 años.',
             'fecha_nacimiento.after'           => 'La fecha de nacimiento no es válida.',
+
+            'telefono.required'         => 'El número de teléfono es obligatorio.',
+            'telefono.regex'            => 'El número de teléfono debe ser válido en España (9 dígitos empezando por 6, 7, 8 o 9).',
+
+
 
         ];
     }

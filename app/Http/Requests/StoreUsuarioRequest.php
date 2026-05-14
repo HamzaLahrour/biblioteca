@@ -40,6 +40,7 @@ class StoreUsuarioRequest extends FormRequest
             'dni.unique'                => 'Este DNI ya pertenece a otro usuario.',
             'fecha_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.before'   => 'La fecha de nacimiento no puede ser futura.',
+            'telefono.required'         => 'El número de teléfono es obligatorio.',
             'telefono.regex' => 'El número de teléfono debe ser válido en España (9 dígitos empezando por 6, 7, 8 o 9).',
 
         ];
