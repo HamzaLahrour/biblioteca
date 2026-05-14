@@ -61,4 +61,14 @@ class PerfilUsuarioController extends Controller
         // Asegúrate de que la carpeta de la vista coincida con donde la vayas a crear
         return view('perfil.historial_reservas', compact('reservas'));
     }
+
+    public function historialPrestamos()
+    {
+        $prestamos = Prestamo::with('libro')
+            ->where('user_id', auth()->id())
+            ->orderBy('fecha_prestamo', 'desc')
+            ->paginate(10);
+
+        return view('perfil.historial_prestamos', compact('prestamos'));
+    }
 }

@@ -16,7 +16,7 @@
 
         <div class="col-md-4 col-lg-3 d-flex justify-content-center">
             @if($libro->portada)
-            <img src="{{ $libro->portada }}" alt="{{ $libro->titulo }}" class="img-fluid rounded-4 book-cover-elegant w-100" style="max-width: 300px;">
+            <img src="{{ asset('storage/' . $libro->portada) }}" alt="{{ $libro->titulo }}" class="img-fluid rounded-4 book-cover-elegant w-100" style="max-width: 300px;">
             @else
             <div class="no-cover-box rounded-4 d-flex flex-column justify-content-center align-items-center w-100" style="max-width: 300px;">
                 <i class="bi bi-book fs-1 mb-3 text-primary opacity-50"></i>

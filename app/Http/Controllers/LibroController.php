@@ -9,6 +9,8 @@ use App\Models\Libro;
 use App\Models\Categoria;
 use App\Models\Prestamo;
 
+use Illuminate\Support\Facades\Storage;
+
 class LibroController extends Controller
 {
     /**
@@ -58,7 +60,17 @@ class LibroController extends Controller
      */
     public function store(StoreLibroRequest $request)
     {
-        Libro::create($request->validated());
+
+        // Guardamos todo lo validado en $data
+        $data = $request->validated();
+
+        if ($request->hasFile('portada')) {
+            // Sobreescribimos el campo portada en el array con la ruta final
+            $data['portada'] = $request->file('portada')->store('portadas', 'public');
+        }
+
+        // ¡Pasamos $data al create!
+        Libro::create($data);
 
         return redirect()->route('libros.index')->with('success', 'Libro creado con éxito');
     }
@@ -114,7 +126,20 @@ class LibroController extends Controller
      */
     public function update(UpdateLibroRequest $request, Libro $libro)
     {
-        $libro->fill($request->validated());
+
+        // Guardamos todo lo validado en $data
+        $data = $request->validated();
+
+        if ($request->hasFile('portada')) {
+            if ($libro->portada) {
+                Storage::disk('public')->delete($libro->portada);
+            }
+            // Sobreescribimos el campo portada en el array
+            $data['portada'] = $request->file('portada')->store('portadas', 'public');
+        }
+
+        // ¡Pasamos $data al fill!
+        $libro->fill($data);
 
         if (!$libro->isDirty()) {
             return redirect()->route('libros.index')
@@ -135,6 +160,10 @@ class LibroController extends Controller
         if ($libro->prestamos()->count() > 0) {
             return redirect()->route('libros.index')
                 ->with('error', 'No puedes borrar un libro que contenga prestamos.');
+        }
+
+        if ($libro->portada) {
+            Storage::disk('public')->delete($libro->portada);
         }
 
         $libro->delete();

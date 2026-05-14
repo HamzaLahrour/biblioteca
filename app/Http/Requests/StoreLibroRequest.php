@@ -31,7 +31,17 @@ class StoreLibroRequest extends FormRequest
             // Validamos que el año sea lógico (hasta el año actual)
             'anio_publicacion' => 'nullable|integer|min:1000|max:' . date('Y'),
             'copias_totales'   => 'required|integer|min:1',
-            'portada'          => 'nullable|string', // Aquí guardaremos la URL de la imagen de Google
+
+
+            'portada'          => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+            ],
+
+
+
             'descripcion'      => 'nullable|string',
             // Validamos que la categoría exista realmente en la BD
             'categoria_id'     => 'required|exists:categorias,id',
@@ -44,13 +54,31 @@ class StoreLibroRequest extends FormRequest
             'titulo.required'         => 'El título del libro es obligatorio.',
             'autor.required'          => 'El autor es obligatorio.',
             'isbn.unique'             => 'Este ISBN ya está registrado en la biblioteca.',
+
+            'anio_publicacion.integer' => 'El año de publicación debe ser un número entero sin decimales.',
             'anio_publicacion.min'    => 'El año de publicación no parece válido.',
             'anio_publicacion.max'    => 'El año no puede ser en el futuro.',
+
             'copias_totales.required' => 'Debes indicar cuántas copias físicas tienes.',
+            'copias_totales.integer'  => 'La cantidad de copias debe ser un número entero (sin ceros a la izquierda ni decimales).',
             'copias_totales.min'      => 'Debes tener al menos 1 copia.',
+
             'categoria_id.required'   => 'Debes seleccionar una categoría.',
             'categoria_id.exists'     => 'La categoría seleccionada no es válida.',
+
+            'portada.image' => 'El archivo seleccionado debe ser una imagen.',
+            'portada.mimes' => 'La portada debe ser un archivo de tipo: jpeg, png, jpg o webp.',
+            'portada.max'   => 'La imagen no puede pesar más de 2MB.',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        if ($this->has('copias_totales') && is_numeric($this->copias_totales)) {
+            $this->merge([
+                'copias_totales' => (int) $this->copias_totales, // Esto convierte "01" en 1
+            ]);
+        }
     }
 
     public function withValidator($validator)

@@ -53,6 +53,9 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/mi-espacio', [PerfilUsuarioController::class, 'index'])->name('perfil.index');
 
+        Route::get('/mi-espacio/prestamos/historial', [PerfilUsuarioController::class, 'historialPrestamos'])
+            ->name('perfil.prestamos.historial');
+
 
         Route::get('/reservar-espacio', [App\Http\Controllers\ReservaUsuarioController::class, 'index'])->name('reservas_usuario.index');
 

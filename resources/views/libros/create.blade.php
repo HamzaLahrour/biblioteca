@@ -7,7 +7,7 @@
     <div class="col-md-8 col-lg-6">
 
         <div class="mb-3">
-            <a href="{{ route('espacios.index') }}" class="text-decoration-none" style="color: var(--text-muted); font-weight: 500;">
+            <a href="{{ route('libros.index') }}" class="text-decoration-none" style="color: var(--text-muted); font-weight: 500;">
                 <i class="bi bi-arrow-left me-1"></i> Volver al listado
             </a>
         </div>
@@ -23,7 +23,8 @@
             </div>
 
             <div class="card-body p-4">
-                <form action="{{ route('libros.store') }}" method="POST">
+                {{-- CAMBIO: Añadido enctype para archivos --}}
+                <form action="{{ route('libros.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-4">
@@ -126,15 +127,16 @@
 
                     <div class="mb-4">
                         <label for="portada" class="form-label" style="font-weight: 600; color: var(--text-main);">
-                            URL de la portada
+                            Portada del libro
                         </label>
-                        <input type="url"
+                        {{-- CAMBIO: De type="url" a type="file" --}}
+                        <input type="file"
                             name="portada"
                             id="portada"
+                            accept="image/*"
                             class="form-control form-control-lg @error('portada') is-invalid @enderror"
-                            value="{{ old('portada') }}"
-                            placeholder="Ej: https://ejemplo.com/portada.jpg"
                             style="font-size: 1rem; border-color: #e0e0e0;">
+                        <div class="form-text">Selecciona una imagen (JPG, PNG, WEBP). Máx 2MB.</div>
                         @error('portada')
                         <div class="invalid-feedback fw-medium">{{ $message }}</div>
                         @enderror

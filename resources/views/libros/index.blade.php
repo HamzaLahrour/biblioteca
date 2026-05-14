@@ -15,7 +15,6 @@
 
     <div class="card-body p-4 pt-3">
 
-        {{-- 🔍 BARRA DE FILTROS PULIDA (Minimalista) --}}
         <div class="bg-light p-3 rounded-4 mb-4 border-0 shadow-inner">
             <form action="{{ route('libros.index') }}" method="GET" class="row g-2 align-items-center">
 
@@ -70,7 +69,7 @@
                     <tr>
                         <td class="py-3 pl-3 border-bottom-subtle">
                             @if($libro->portada)
-                            <img src="{{ $libro->portada }}" alt="Portada" class="rounded shadow-sm border-0" style="width: 45px; height: 65px; object-fit: cover;">
+                            <img src="{{ asset('storage/' . $libro->portada) }}" alt="Portada" class="rounded shadow-sm border-0" style="width: 45px; height: 65px; object-fit: cover;">
                             @else
                             <div class="bg-light d-flex justify-content-center align-items-center border rounded shadow-sm" style="width: 45px; height: 65px;">
                                 <i class="bi bi-journal-text text-muted fs-5"></i>

@@ -23,7 +23,7 @@
             </div>
 
             <div class="card-body p-4">
-                <form action="{{ route('libros.update', $libro->id) }}" method="POST">
+                <form action="{{ route('libros.update', $libro->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -34,7 +34,7 @@
                             id="titulo"
                             class="form-control form-control-lg @error('titulo') is-invalid @enderror"
                             value="{{ old('titulo', $libro->titulo) }}"
-                            placeholder="Ej: Don Quijote de la Mancha..."
+                            placeholder="Ej: Don Quijote..."
                             style="font-size: 1rem; border-color: #e0e0e0;">
                         @error('titulo')
                         <div class="invalid-feedback fw-medium">{{ $message }}</div>
@@ -56,15 +56,13 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="isbn" class="form-label" style="font-weight: 600; color: var(--text-main);">
-                            ISBN <span class="text-danger">*</span>
-                        </label>
+                        <label for="isbn" class="form-label" style="font-weight: 600; color: var(--text-main);">ISBN <span class="text-danger">*</span></label>
                         <input type="text"
                             name="isbn"
                             id="isbn"
                             class="form-control form-control-lg @error('isbn') is-invalid @enderror"
                             value="{{ old('isbn', $libro->isbn) }}"
-                            placeholder="Ej: 978-84-376-0494-7"
+                            placeholder="Ej: 978-84..."
                             style="font-size: 1rem; border-color: #e0e0e0;">
                         @error('isbn')
                         <div class="invalid-feedback fw-medium">{{ $message }}</div>
@@ -72,9 +70,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="editorial" class="form-label" style="font-weight: 600; color: var(--text-main);">
-                            Editorial <span class="text-danger">*</span>
-                        </label>
+                        <label for="editorial" class="form-label" style="font-weight: 600; color: var(--text-main);">Editorial <span class="text-danger">*</span></label>
                         <input type="text"
                             name="editorial"
                             id="editorial"
@@ -94,9 +90,7 @@
                         :selected="$libro->categoria_id" />
 
                     <div class="mb-4">
-                        <label for="anio_publicacion" class="form-label" style="font-weight: 600; color: var(--text-main);">
-                            Año de publicación <span class="text-danger">*</span>
-                        </label>
+                        <label for="anio_publicacion" class="form-label" style="font-weight: 600; color: var(--text-main);">Año de publicación <span class="text-danger">*</span></label>
                         <input type="number"
                             name="anio_publicacion"
                             id="anio_publicacion"
@@ -110,9 +104,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="copias_totales" class="form-label" style="font-weight: 600; color: var(--text-main);">
-                            Copias totales <span class="text-danger">*</span>
-                        </label>
+                        <label for="copias_totales" class="form-label" style="font-weight: 600; color: var(--text-main);">Copias totales <span class="text-danger">*</span></label>
                         <input type="number"
                             name="copias_totales"
                             id="copias_totales"
@@ -126,31 +118,34 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="portada" class="form-label" style="font-weight: 600; color: var(--text-main);">
-                            URL de la portada
-                        </label>
-                        <input type="url"
+                        <label for="portada" class="form-label" style="font-weight: 600; color: var(--text-main);">Portada del libro</label>
+
+                        @if($libro->portada)
+                        <div class="mb-2">
+                            <img src="{{ asset('storage/' . $libro->portada) }}" alt="Portada actual" style="max-height: 150px; border-radius: 8px;" class="img-thumbnail">
+                        </div>
+                        @endif
+
+                        <input type="file"
                             name="portada"
                             id="portada"
+                            accept="image/*"
                             class="form-control form-control-lg @error('portada') is-invalid @enderror"
-                            value="{{ old('portada', $libro->portada) }}"
-                            placeholder="Ej: https://ejemplo.com/portada.jpg"
                             style="font-size: 1rem; border-color: #e0e0e0;">
+                        <div class="form-text">Deja este campo vacío para mantener la imagen actual.</div>
                         @error('portada')
                         <div class="invalid-feedback fw-medium">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label for="descripcion" class="form-label" style="font-weight: 600; color: var(--text-main);">
-                            Descripción
-                        </label>
+                        <label for="descripcion" class="form-label" style="font-weight: 600; color: var(--text-main);">Descripción</label>
                         <textarea
                             name="descripcion"
                             id="descripcion"
                             rows="4"
                             class="form-control form-control-lg @error('descripcion') is-invalid @enderror"
-                            placeholder="Breve resumen del libro..."
+                            placeholder="Breve resumen..."
                             style="font-size: 1rem; border-color: #e0e0e0;">{{ old('descripcion', $libro->descripcion) }}</textarea>
                         @error('descripcion')
                         <div class="invalid-feedback fw-medium">{{ $message }}</div>

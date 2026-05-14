@@ -34,7 +34,7 @@
                     {{-- COLUMNA DE PORTADA Y STOCK --}}
                     <div class="col-md-4 text-center mb-4 mb-md-0 d-flex flex-column align-items-center">
                         @if($libro->portada)
-                        <img src="{{ $libro->portada }}" alt="Portada de {{ $libro->titulo }}" class="img-fluid rounded-3 shadow-sm portada-libro" style="max-height: 300px; object-fit: cover;">
+                        <img src="{{ Str::startsWith($libro->portada, 'http') ? $libro->portada : asset('storage/' . $libro->portada) }}" alt="Portada de {{ $libro->titulo }}" class="img-fluid rounded-3 shadow-sm portada-libro" style="max-height: 300px; object-fit: cover;">
                         @else
                         <div class="placeholder-portada d-flex flex-column justify-content-center align-items-center rounded-3" style="height: 300px; width: 100%; max-width: 200px;">
                             <i class="bi bi-book opacity-50" style="font-size: 5rem;"></i>

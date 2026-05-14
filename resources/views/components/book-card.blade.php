@@ -11,7 +11,7 @@ $disponibles = $libro->copias_totales - $prestados;
     <div class="card h-100 book-card border-0 shadow-sm-hover">
         <div class="book-cover-container position-relative skeleton-bg">
             @if($libro->portada)
-            <img src="{{ $libro->portada }}" alt="{{ $libro->titulo }}" class="book-cover" onload="this.parentElement.classList.remove('skeleton-bg'); this.style.opacity=1;" style="opacity: 0;">
+            <img src="{{ asset('storage/' . $libro->portada) }}" alt="{{ $libro->titulo }}" class="book-cover" onload="this.parentElement.classList.remove('skeleton-bg'); this.style.opacity=1;" style="opacity: 0;">
             @else
             <div class="book-cover d-flex justify-content-center align-items-center" style="background-color: var(--bg-light);">
                 <i class="bi bi-book fs-1" style="color: var(--secondary-light); opacity: 0.5;"></i>

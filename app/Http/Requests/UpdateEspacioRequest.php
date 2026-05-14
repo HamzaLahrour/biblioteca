@@ -16,8 +16,6 @@ class UpdateEspacioRequest extends FormRequest
         return true;
     }
 
-
-
     /**
      * Prepara los datos antes de validarlos (limpia y pasa el código a MAYÚSCULAS).
      */
@@ -37,17 +35,17 @@ class UpdateEspacioRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Pillamos el ID del espacio que estamos editando desde la ruta
-        $espacioId = $this->route('espacio')->id;
+        // Obtenemos el modelo 'espacio' de la ruta para ignorarlo en la regla unique
+        $espacio = $this->route('espacio');
 
         return [
             'nombre' => [
                 'required',
                 'string',
                 'min:2',
-                'max:255',
+                'max:100', // Bajado de 255 a 100
                 'regex:/^(?=.*[a-zA-ZñÑáéíóúÁÉÍÓÚ])[a-zA-Z0-9\sñÑáéíóúÁÉÍÓÚ]+$/',
-                'unique:espacios,nombre,' . $espacioId // <-- Sin la clase Rule
+                Rule::unique('espacios', 'nombre')->ignore($espacio)
             ],
             'codigo' => [
                 'required',
@@ -55,12 +53,12 @@ class UpdateEspacioRequest extends FormRequest
                 'min:2',
                 'max:20',
                 'regex:/^[A-Z0-9\-_]+$/',
-                'unique:espacios,codigo,' . $espacioId // <-- Sin la clase Rule
+                Rule::unique('espacios', 'codigo')->ignore($espacio)
             ],
             'ubicacion' => [
                 'required',
                 'string',
-                'max:255'
+                'max:100' // Bajado de 255 a 100
             ],
             'capacidad' => [
                 'required',
@@ -82,23 +80,39 @@ class UpdateEspacioRequest extends FormRequest
     public function messages(): array
     {
         return [
+            // Nombre
             'nombre.required'          => 'El nombre es obligatorio.',
+            'nombre.string'            => 'El nombre debe ser un texto válido.',
             'nombre.min'               => 'El nombre debe tener al menos 2 caracteres.',
+            'nombre.max'               => 'El nombre no puede superar los 100 caracteres.',
             'nombre.regex'             => 'El nombre debe contener al menos una letra. No puede estar formado solo por números.',
             'nombre.unique'            => 'Ese nombre de espacio ya está en uso. Elige otro para evitar confusiones.',
 
+            // Código
             'codigo.required'          => 'El código es obligatorio.',
+            'codigo.string'            => 'El código debe ser un texto válido.',
+            'codigo.min'               => 'El código debe tener al menos 2 caracteres.',
+            'codigo.max'               => 'El código no puede superar los 20 caracteres.',
             'codigo.regex'             => 'El código solo puede contener letras, números, guiones y guiones bajos. Sin espacios.',
             'codigo.unique'            => 'Este código ya lo tiene otro espacio.',
 
+            // Ubicación
             'ubicacion.required'       => 'La ubicación es obligatoria.',
+            'ubicacion.string'         => 'La ubicación debe ser un texto válido.',
+            'ubicacion.max'            => 'La ubicación no puede superar los 100 caracteres.',
 
+            // Capacidad
             'capacidad.required'       => 'Debes indicar la capacidad del espacio.',
+            'capacidad.integer'        => 'La capacidad debe ser un número entero.',
             'capacidad.min'            => 'La capacidad debe ser al menos de 1 persona.',
-            'capacidad.max'            => 'La capacidad maxima es de 150.',
+            'capacidad.max'            => 'La capacidad máxima es de 150.',
 
+            // Tipo Espacio
             'tipo_espacio_id.required' => 'Debes seleccionar un tipo.',
             'tipo_espacio_id.exists'   => 'La clasificación seleccionada no es válida.',
+
+            // Disponible
+            'disponible.boolean'       => 'El valor de disponibilidad no es válido.',
         ];
     }
 }

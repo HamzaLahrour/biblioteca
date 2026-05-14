@@ -36,7 +36,7 @@ class StoreEspacioRequest extends FormRequest
                 'required',
                 'string',
                 'min:2',
-                'max:255',
+                'max:90',
                 'regex:/^(?=.*[a-zA-ZñÑáéíóúÁÉÍÓÚ])[a-zA-Z0-9\sñÑáéíóúÁÉÍÓÚ]+$/',
                 'unique:espacios'
             ],
@@ -85,7 +85,7 @@ class StoreEspacioRequest extends FormRequest
             'codigo.required'          => 'El código es obligatorio.',
             'codigo.string'            => 'El código debe ser una cadena de texto.',
             'codigo.min'               => 'El código debe tener al menos 2 caracteres.',
-            'codigo.max'               => 'El código no puede superar los 20 caracteres.', // Corrige validation.max.string de la imagen
+            'codigo.max'               => 'El código no puede superar los 20 caracteres.',
             'codigo.regex'             => 'El código solo puede contener letras, números, guiones y guiones bajos. Sin espacios.',
             'codigo.unique'            => 'Este código ya está en uso. Elige otro.',
 
@@ -96,7 +96,7 @@ class StoreEspacioRequest extends FormRequest
 
             // Capacidad
             'capacidad.required'       => 'Debes indicar la capacidad del espacio.',
-            'capacidad.integer'        => 'La capacidad debe ser un número entero (sin decimales ni letras).', // Corrige validation.integer de la imagen
+            'capacidad.integer'        => 'La capacidad debe ser un número entero (sin decimales ni letras).',
             'capacidad.min'            => 'La capacidad debe ser al menos de 1 persona.',
             'capacidad.max'            => 'La capacidad máxima es de 150 personas.',
 

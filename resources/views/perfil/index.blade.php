@@ -63,9 +63,21 @@
         <div class="col-lg-8">
 
             {{-- MIS PRÉSTAMOS ACTIVOS --}}
-            <div class="d-flex justify-content-between align-items-end mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                {{-- Elemento 1 (Izquierda) --}}
                 <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Mis Lecturas</h4>
-                <a href="{{ route('catalogo.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">Explorar</a>
+
+                {{-- Elemento 2 (Derecha: Envolvemos los dos botones en un div) --}}
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{ route('perfil.prestamos.historial') }}" class="text-muted text-decoration-none fw-bold transition-hover" style="font-size: 0.85rem;">
+                        Ver todos
+                    </a>
+                    <a href="{{ route('catalogo.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
+                        Explorar
+                    </a>
+                </div>
+
             </div>
 
             @if($prestamos->count() > 0)
@@ -82,7 +94,7 @@
                         <div class="card-body p-3 d-flex align-items-center">
                             <div class="bg-light rounded-3 overflow-hidden me-3 flex-shrink-0 book-thumb">
                                 @if($prestamo->libro->portada)
-                                <img src="{{ $prestamo->libro->portada }}" alt="Portada" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="{{ asset('storage/' . $prestamo->libro->portada) }}" alt="Portada" style="width: 100%; height: 100%; object-fit: cover;">
                                 @else
                                 <div class="w-100 h-100 d-flex justify-content-center align-items-center text-muted" style="background-color: var(--bg-light);">
                                     <i class="bi bi-book text-primary opacity-50"></i>
