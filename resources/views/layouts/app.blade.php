@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* 🧬 NUESTRO ADN GLOBAL (Paleta Fase Gold) 🧬 */
         :root {
             --primary: #1E90FF;
             /* Azul Dodger */
@@ -71,7 +70,6 @@
             z-index: 1050;
         }
 
-        /* --- INICIO DE CAMBIOS DE ANIMACIÓN EXACTOS --- */
         .nav-link {
             color: var(--text-muted) !important;
             font-weight: 500;
@@ -108,20 +106,16 @@
             transform: translateX(-50%);
         }
 
-        /* Crece solo al hacer hover (al 60% para que no pise el margen invisible de Bootstrap) */
         .nav-link:hover::after {
             width: 60%;
         }
 
-        /* Si está en esa página, NO muestra la línea, solo el color azul */
         .nav-link.active::after {
             display: none !important;
         }
 
-        /* --- FIN DE CAMBIOS DE ANIMACIÓN --- */
 
 
-        /* 👤 AVATAR PREMIUM */
         .avatar-wrapper {
             width: 36px;
             height: 36px;

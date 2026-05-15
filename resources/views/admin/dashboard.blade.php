@@ -43,8 +43,7 @@
                     <div class="card-body p-4 d-flex align-items-center justify-content-between">
                         <div>
                             <h6 class="text-muted fw-bold text-uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Préstamos Activos</h6>
-                            <h2 class="fw-bolder mb-1" style="color: var(--primary);">{{ $prestamosActivos }}</h2>
-                            @if($prestamosVencidos > 0)
+                            <h2 class="fw-bolder mb-1 text-dark">{{ $prestamosActivos }}</h2> @if($prestamosVencidos > 0)
                             <p class="mb-0 text-danger" style="font-size: 0.78rem;"><i class="bi bi-exclamation-circle me-1"></i>{{ $prestamosVencidos }} vencido(s)</p>
                             @elseif($prestamosProximos > 0)
                             <p class="mb-0 text-warning" style="font-size: 0.78rem;"><i class="bi bi-clock me-1"></i>{{ $prestamosProximos }} vencen pronto</p>

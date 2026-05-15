@@ -5,7 +5,6 @@
 @section('content')
 <div class="container py-5 mb-5">
 
-    {{-- CABECERA DE SECCIÓN --}}
     <div class="mb-5">
         <h2 class="fw-bold mb-1" style="color: var(--text-main); letter-spacing: -0.5px;">
             Mi <span class="text-gradient">Espacio</span>
@@ -14,7 +13,6 @@
     </div>
 
     <div class="row g-4 g-xl-5">
-        {{-- COLUMNA IZQUIERDA: EL CARNET Y SANCIONES --}}
         <div class="col-lg-4">
 
             @if($sancionActiva)
@@ -30,9 +28,7 @@
             </div>
             @endif
 
-            {{-- 🪪 CARNET DIGITAL --}}
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 digital-card position-relative">
-                {{-- Efectos de fondo abstracto --}}
                 <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 150px; height: 150px; top: -50px; right: -50px;"></div>
                 <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 100px; height: 100px; bottom: -20px; left: -20px;"></div>
                 <i class="bi bi-fingerprint position-absolute opacity-10" style="font-size: 8rem; right: -10px; bottom: -10px; color: white;"></i>
@@ -49,26 +45,20 @@
                     <h3 class="fw-bold mb-1 text-truncate" title="{{ $usuario->name }}">{{ $usuario->name }}</h3>
                     <div class="small mb-4 text-truncate" style="color: rgba(255,255,255,0.8);">{{ $usuario->email }}</div>
 
-                    {{-- DNI con efecto Glassmorphism --}}
                     <div class="p-3 rounded-3 mb-2 text-center glass-panel">
                         <div class="font-monospace fw-bold fs-5" style="letter-spacing: 3px;">{{ $usuario->dni ?? 'SIN-DNI' }}</div>
                     </div>
-                    <div class="text-center font-monospace" style="font-size: 0.65rem; color: rgba(255,255,255,0.6);">ID: {{ str_pad($usuario->id, 8, '0', STR_PAD_LEFT) }}</div>
                 </div>
             </div>
 
         </div>
 
-        {{-- COLUMNA DERECHA: MIS COSAS (Préstamos y Reservas) --}}
         <div class="col-lg-8">
 
-            {{-- MIS PRÉSTAMOS ACTIVOS --}}
             <div class="d-flex justify-content-between align-items-center mb-3">
 
-                {{-- Elemento 1 (Izquierda) --}}
                 <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Mis Lecturas</h4>
 
-                {{-- Elemento 2 (Derecha: Envolvemos los dos botones en un div) --}}
                 <div class="d-flex align-items-center gap-3">
                     <a href="{{ route('perfil.prestamos.historial') }}" class="text-muted text-decoration-none fw-bold transition-hover" style="font-size: 0.85rem;">
                         Ver todos
@@ -121,20 +111,17 @@
                                         @endif
 
                                         <div class="mt-2">
-                                            {{-- PRIORIDAD 1: ¿Ha alcanzado el límite dinámico de la base de datos? --}}
                                             @if($prestamo->renovaciones >= App\Models\Configuracion::get('max_renovaciones', 2))
                                             <div class="d-flex align-items-center text-danger fw-bold" style="font-size: 0.75rem;">
                                                 <i class="bi bi-exclamation-octagon-fill me-2"></i>
                                                 Límite de renovaciones alcanzado
                                             </div>
 
-                                            {{-- PRIORIDAD 2: ¿El préstamo ya ha vencido? --}}
                                             @elseif($diasRestantes < 0)
                                                 <div class="text-muted" style="font-size: 0.75rem;">
                                                 <i class="bi bi-info-circle me-2"></i> Préstamo vencido, contacta con la biblioteca
                                         </div>
 
-                                        {{-- PRIORIDAD 3: ¿Estamos en la ventana de los últimos 3 días? --}}
                                         @elseif($diasRestantes <= 3)
                                             <form action="{{ route('perfil.prestamos.renovar', $prestamo->id) }}" method="POST" onsubmit="return confirm('¿Quieres solicitar una ampliación para este libro?')">
                                             @csrf
@@ -143,7 +130,6 @@
                                             </button>
                                             </form>
 
-                                            {{-- PRIORIDAD 4: Si no es nada de lo anterior, es demasiado pronto --}}
                                             @else
                                             <span class="text-muted" style="font-size: 0.7rem;">
                                                 <i class="bi bi-calendar-event me-1"></i>
@@ -158,7 +144,6 @@
             @endforeach
         </div>
         @else
-        {{-- Empty State Premium --}}
         <div class="empty-state-card p-5 text-center mb-5">
             <div class="empty-icon-wrapper mx-auto mb-3">
                 <i class="bi bi-book"></i>
@@ -168,7 +153,6 @@
         </div>
         @endif
 
-        {{-- SECCIÓN: MIS RESERVAS DE SALAS --}}
         <div class="d-flex justify-content-between align-items-end mb-3 mt-4">
             <h4 class="fw-bold m-0" style="color: var(--secondary-dark);">Próximas Reservas</h4>
             <div>
@@ -190,24 +174,20 @@
             $enCurso = $ahora->between($inicio, $fin);
             $minutosParaInicio = $ahora->diffInMinutes($inicio, false);
 
-            //Cancelable si no ha pasado, no está en curso y faltan >= 30 min
             $puedeCancelar = !$yaPaso && !$enCurso && ($minutosParaInicio >= 30);
             @endphp
 
-            {{-- Oculta la tarjeta si ya pasó o está cancelada --}}
             @if(!$yaPaso && $reserva->estado !== 'cancelada')
             <div class="col">
                 <div class="card border border-light shadow-sm rounded-4 overflow-hidden float-card">
                     <div class="card-body p-3 d-flex justify-content-between align-items-center">
 
                         <div class="d-flex align-items-center">
-                            {{-- Fecha Icon Box --}}
                             <div class="date-box me-3">
                                 <span class="fs-5 fw-bold" style="line-height: 1;">{{ $inicio->format('d') }}</span>
                                 <span class="small text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ $inicio->isoFormat('MMM') }}</span>
                             </div>
 
-                            {{-- Información Limpia --}}
                             <div>
                                 <h6 class="fw-bold mb-1" style="color: var(--secondary-dark);">{{ $reserva->espacio->nombre ?? 'Sala' }}</h6>
                                 <div class="text-muted small fw-medium">
@@ -226,7 +206,6 @@
                             </button>
                         </form>
                         @elseif(!$enCurso)
-                        {{-- Candado sutil (margen de 30 min superado) --}}
                         <button type="button" class="btn btn-sm text-muted rounded-circle p-2 border-0" title="Demasiado tarde para cancelar" style="background: transparent; cursor: not-allowed;">
                             <i class="bi bi-lock-fill fs-5 opacity-50"></i>
                         </button>
@@ -239,7 +218,6 @@
             @endforeach
         </div>
         @else
-        {{-- Empty State Premium --}}
         <div class="empty-state-card p-4 text-center">
             <p class="text-muted small mb-0">No tienes ninguna sala reservada para los próximos días.</p>
         </div>
@@ -262,7 +240,6 @@
         --success-soft: rgba(34, 197, 94, 0.15);
     }
 
-    /* TEXTO DEGRADADO */
     .text-gradient {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-light) 100%);
         -webkit-background-clip: text;
@@ -271,7 +248,6 @@
         font-weight: 800;
     }
 
-    /* ALERTA CUSTOM SANCIONES */
     .custom-alert-danger {
         background-color: var(--danger-soft);
         color: #ef4444;
@@ -279,7 +255,6 @@
         border-radius: 16px;
     }
 
-    /* CARNET DIGITAL */
     .digital-card {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-dark) 100%);
         box-shadow: 0 10px 30px var(--primary-soft) !important;
@@ -302,7 +277,6 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    /* TARJETAS FLOTANTES (Préstamos y Reservas) */
     .float-card {
         transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
     }
@@ -312,14 +286,12 @@
         box-shadow: 0 12px 25px var(--primary-soft) !important;
     }
 
-    /* MINIATURAS DE LIBROS */
     .book-thumb {
         width: 60px;
         height: 85px;
         border: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    /* ETIQUETAS DE ESTADO (Custom Tags) */
     .custom-tag {
         display: inline-block;
         padding: 4px 10px;
@@ -343,7 +315,6 @@
         color: #16a34a;
     }
 
-    /* FECHA RESERVAS (Icon Box) */
     .date-box {
         width: 55px;
         height: 55px;
@@ -356,7 +327,6 @@
         align-items: center;
     }
 
-    /* BOTONES */
     .btn-outline-primary {
         color: var(--primary);
         border: 2px solid var(--primary-soft);
@@ -382,7 +352,6 @@
         color: #ef4444;
     }
 
-    /* EMPTY STATES */
     .empty-state-card {
         border-radius: 24px;
         background: #fff;

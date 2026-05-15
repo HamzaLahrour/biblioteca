@@ -27,7 +27,6 @@
     </div>
     @endif
 
-    {{-- CUADRÍCULA DE ESPACIOS --}}
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 justify-content-center g-4 mx-auto" style="max-width: 1200px;">
         @foreach($tipos as $tipo)
         <div class="col">
@@ -44,7 +43,6 @@
                     </p>
 
                     <div class="mt-auto">
-                        {{-- Indicador de disponibilidad estilo Catálogo --}}
                         <div class="status-indicator justify-content-center mb-4">
                             @if($tipo->espacios_count > 0)
                             <span class="status-dot available"></span>
@@ -73,7 +71,7 @@
 </div>
 
 <style>
-    /* VARIABLES LOCALES (Nuestro ADN) */
+    /* VARIABLES LOCALES */
     :root {
         --primary: #1E90FF;
         --secondary-dark: #0D47A1;
