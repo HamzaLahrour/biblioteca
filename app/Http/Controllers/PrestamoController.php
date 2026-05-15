@@ -24,10 +24,6 @@ class PrestamoController extends Controller
 
     protected $prestamoService;
 
-    /**
-     * Inyectamos nuestro super-servicio en el constructor.
-     * Así lo tenemos disponible en todos los métodos con $this->prestamoService
-     */
     public function __construct(PrestamoService $prestamoService)
     {
         $this->prestamoService = $prestamoService;
@@ -37,22 +33,18 @@ class PrestamoController extends Controller
     {
         $query = Prestamo::with(['user', 'libro']);
 
-        // 1. Filtro de Estado (El que ya teníamos)
         $query->when(request('estado'), function ($q, $estado) {
             $q->where('estado', $estado);
         });
 
-        // 2. Filtro de Fecha: Desde
         $query->when(request('desde'), function ($q, $desde) {
             $q->whereDate('fecha_prestamo', '>=', $desde);
         });
 
-        // 3. Filtro de Fecha: Hasta
         $query->when(request('hasta'), function ($q, $hasta) {
             $q->whereDate('fecha_prestamo', '<=', $hasta);
         });
 
-        // 4. Ordenamiento Dinámico (Por defecto: más recientes primero)
         $orden = request('orden', 'desc');
         $query->orderBy('fecha_prestamo', $orden);
 

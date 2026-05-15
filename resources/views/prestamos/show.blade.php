@@ -6,7 +6,6 @@
 <div class="row justify-content-center mb-5">
     <div class="col-md-10 col-lg-8">
 
-        {{-- BOTÓN VOLVER --}}
         <div class="mb-3">
             <a href="{{ route('prestamos.index') }}" class="text-decoration-none text-muted fw-medium">
                 <i class="bi bi-arrow-left me-1"></i> Volver al mostrador
@@ -15,7 +14,6 @@
 
         <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
 
-            {{-- CABECERA: ESTADO DEL PRÉSTAMO --}}
             <div class="p-4 text-center {{ 
                 $prestamo->estado === 'activo' ? 'bg-primary text-white' : 
                 ($prestamo->estado === 'devuelto' ? 'bg-success text-white' : 
@@ -39,7 +37,6 @@
 
             <div class="card-body p-4 pt-5">
 
-                {{-- DOS COLUMNAS: QUIÉN Y QUÉ --}}
                 <div class="row g-4 mb-5">
 
                     {{-- DATOS DEL LECTOR --}}
@@ -73,7 +70,7 @@
                         </h6>
                         <div class="d-flex mb-3">
                             @if($prestamo->libro->portada)
-                            <img src="{{ $prestamo->libro->portada }}" alt="Portada" class="rounded border shadow-sm me-3" style="width: 50px; height: 75px; object-fit: cover;">
+                            <img src="{{ asset('storage/' . $prestamo->libro->portada) }}" alt="Portada" class="rounded border shadow-sm me-3" style="width: 50px; height: 75px; object-fit: cover;">
                             @else
                             <div class="bg-light border rounded shadow-sm d-flex justify-content-center align-items-center me-3" style="width: 50px; height: 75px;">
                                 <i class="bi bi-book text-muted"></i>
@@ -93,7 +90,7 @@
                     </div>
                 </div>
 
-                {{-- BLOQUE DE FECHAS CLAVE --}}
+                {{-- BLOQUE DE FECHAS --}}
                 <div class="bg-light p-4 rounded-4 border border-secondary border-opacity-10">
                     <h6 class="fw-bold text-muted text-uppercase mb-3 text-center" style="letter-spacing: 1px;">Registro Temporal</h6>
 

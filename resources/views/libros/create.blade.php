@@ -23,7 +23,6 @@
             </div>
 
             <div class="card-body p-4">
-                {{-- CAMBIO: Añadido enctype para archivos --}}
                 <form action="{{ route('libros.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
@@ -129,7 +128,6 @@
                         <label for="portada" class="form-label" style="font-weight: 600; color: var(--text-main);">
                             Portada del libro
                         </label>
-                        {{-- CAMBIO: De type="url" a type="file" --}}
                         <input type="file"
                             name="portada"
                             id="portada"

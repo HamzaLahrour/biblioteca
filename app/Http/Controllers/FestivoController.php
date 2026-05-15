@@ -17,7 +17,7 @@ class FestivoController extends Controller
         return view('admin.festivos', compact('festivos'));
     }
 
-    // 2. Guardar un nuevo festivo en la base de datos
+    // Guardar un nuevo festivo en la base de datos
     public function store(Request $request)
     {
         // Validación directa (¡incluye la regla unique para que no repita días!)

@@ -118,10 +118,8 @@
     <div class="container-fluid">
         <div class="row">
 
-            {{-- Le quitamos el padding al nav y se lo damos al div interno --}}
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse px-0">
 
-                {{-- MAGIA AQUI: Este div controla el alto total y empuja el final hacia abajo --}}
                 <div class="sidebar-inner px-3">
 
                     <div class="pt-3 flex-grow-1">

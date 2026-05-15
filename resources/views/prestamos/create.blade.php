@@ -12,7 +12,6 @@
             </a>
         </div>
 
-        {{-- Alertas de Error del Backend --}}
         @if(session('error'))
         <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center mb-4">
             <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
@@ -32,7 +31,6 @@
                 <form action="{{ route('prestamos.store') }}" method="POST">
                     @csrf
 
-                    {{-- PASO 1: EL USUARIO --}}
                     <div class="mb-4">
                         <label for="user_id" class="form-label fw-bold text-dark">1. Lector (Alumno/Profesor) <span class="text-danger">*</span></label>
                         <select name="user_id" id="buscador-usuarios" class="form-select form-select-lg" placeholder="🔍 Buscar por nombre, email o DNI..." required>
@@ -48,13 +46,11 @@
                         @enderror
                     </div>
 
-                    {{-- PASO 2: EL LIBRO --}}
                     <div class="mb-4 p-3 rounded-4 border bg-light">
                         <label for="libro_id" class="form-label fw-bold text-dark">2. Libro a Prestar <span class="text-danger">*</span></label>
                         <select name="libro_id" id="buscador-libros" class="form-select form-select-lg" placeholder="🔍 Buscar por título, autor o ISBN..." required>
                             <option value="">Selecciona un libro...</option>
                             @foreach($libros as $libro)
-                            {{-- Solo mostramos libros con stock para no frustrar al admin --}}
                             @if($libro->copias_totales > 0 && $libro->estado !== 'en_reparacion')
                             <option value="{{ $libro->id }}" {{ old('libro_id') == $libro->id ? 'selected' : '' }}>
                                 {{ $libro->titulo }} - {{ $libro->autor }} (Stock: (Stock: {{ $libro->disponibles }} / {{ $libro->copias_totales }}))
@@ -73,14 +69,12 @@
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-calendar-event"></i></span>
 
-                            {{-- MAGIA: Usamos la variable $fechaPorDefecto que calculó el Controlador --}}
                             <input type="date" name="fecha_devolucion_prevista" id="fecha_devolucion_prevista"
                                 class="form-control form-control-lg border-start-0 ps-0 @error('fecha_devolucion_prevista') is-invalid @enderror"
                                 value="{{ old('fecha_devolucion_prevista', $fechaPorDefecto) }}"
                                 min="{{ now()->addDay()->format('Y-m-d') }}" required>
                         </div>
 
-                        {{-- MAGIA: El texto también es dinámico ahora --}}
                         <div class="form-text small">El sistema calcula {{ $diasPrestamo }} días por defecto según la configuración, pero puedes modificarlo.</div>
 
                         @error('fecha_devolucion_prevista')

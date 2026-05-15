@@ -6,12 +6,10 @@
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-6">
 
-            {{-- Botón de Volver Premium --}}
             <a href="{{ route('reservas_usuario.index') }}" class="back-link mb-4 d-inline-block">
                 <i class="bi bi-arrow-left me-2"></i>Volver a tipos de espacio
             </a>
 
-            {{-- Cabecera con nuestro ADN --}}
             <div class="mb-5 text-center">
                 <span class="badge badge-custom rounded-pill px-3 py-2 fw-bold mb-3 d-inline-block">
                     <i class="bi bi-grid-1x2 me-1"></i> {{ $tipo->nombre }}
@@ -24,7 +22,6 @@
 
 
 
-            {{-- Tarjeta de Formulario Premium --}}
             <form action="{{ route('reservas_usuario.comprobar', $tipo->id) }}" method="POST" class="booking-form p-4 p-md-5">
                 @csrf
 
@@ -115,7 +112,6 @@
         font-weight: 800;
     }
 
-    /* ENLACE DE VOLVER */
     .back-link {
         color: var(--text-muted);
         text-decoration: none;
@@ -128,14 +124,12 @@
         transform: translateX(-3px);
     }
 
-    /* INSIGNIA DEL TIPO DE ESPACIO */
     .badge-custom {
         background-color: var(--primary-soft);
         color: var(--secondary-dark);
         border: 1px solid rgba(30, 144, 255, 0.2);
     }
 
-    /* CONTENEDOR DEL FORMULARIO */
     .booking-form {
         background-color: #fff;
         border-radius: 24px;
@@ -143,7 +137,6 @@
         border: 1px solid rgba(0, 0, 0, 0.03);
     }
 
-    /* INPUTS CUSTOMIZADOS */
     .custom-input {
         background-color: var(--bg-light);
         border: 2px solid transparent;

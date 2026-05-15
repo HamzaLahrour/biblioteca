@@ -119,14 +119,12 @@
                             @endif
                         </td>
                         <td class="text-end py-3">
-                            {{-- Contenedor flex con gap para separar los botones --}}
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ route('reservas.show', $reserva->id) }}"
                                     class="btn btn-sm btn-outline-primary" title="Ver detalles">
                                     <i class="bi bi-eye-fill me-1"></i> Ver
                                 </a>
 
-                                {{-- Solo botón de cancelar si está activa y no ha pasado la hora de fin --}}
                                 @if($reserva->estado === 'activa' && !\Carbon\Carbon::parse($reserva->fecha_reserva . ' ' . $reserva->hora_fin)->isPast())
                                 <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta reserva? Liberarás el hueco.');">
                                     @csrf
@@ -144,7 +142,6 @@
             </table>
         </div>
 
-        {{-- PAGINACIÓN TRADUCIDA CON AIRE --}}
         <div class="mt-5 mb-2 d-flex flex-column flex-md-row justify-content-between align-items-center gap-4 custom-pagination">
             <div class="text-muted small bg-light px-3 py-2 rounded-pill border border-neutral-100 shadow-sm-inner">
                 Mostrando del <span class="fw-bold text-dark">{{ $reservas->firstItem() ?? 0 }}</span> al <span class="fw-bold text-dark">{{ $reservas->lastItem() ?? 0 }}</span> de <span class="fw-bold text-primary">{{ $reservas->total() ?? 0 }}</span> resultados
@@ -175,12 +172,10 @@
 
     .custom-pagination nav>div.d-flex.justify-content-between.flex-fill.d-sm-none {
         display: none !important;
-        /* Oculta texto por defecto de Laravel en móvil */
     }
 
     .custom-pagination nav>div.d-none.flex-sm-fill.d-sm-flex>div:first-child {
         display: none !important;
-        /* Oculta texto por defecto de Laravel en desktop */
     }
 
     .pagination-wrapper {

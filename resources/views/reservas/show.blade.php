@@ -15,7 +15,6 @@
 
 <div class="card shadow-sm border-0 rounded-4 overflow-hidden" style="max-width: 600px;">
 
-    {{-- Cabecera: datos del usuario --}}
     <div class="card-header bg-light border-0 p-4">
         <div class="d-flex align-items-center gap-3">
             <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center fw-bold text-primary"
@@ -41,7 +40,6 @@
         </div>
     </div>
 
-    {{-- Cuerpo: datos de la reserva --}}
     <div class="card-body p-0">
         <table class="table table-borderless mb-0" style="font-size:14px;">
             <tbody>

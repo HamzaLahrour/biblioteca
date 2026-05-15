@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LibreLah — Inicia sesión</title>
 
-    {{-- Preload de la imagen para que el LCP sea rápido --}}
     <link rel="preload" as="image" href="{{ asset('img/biblioteca-fondo.jpg') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -181,12 +180,10 @@
             padding-right: 70px !important;
         }
 
-        /* 2. Desplaza el ojito a la izquierda SOLO cuando hay error (cuando existe el icono rojo) */
         .input-wrapper .form-control.is-invalid+.toggle-password {
             right: 40px;
         }
 
-        /* Fila "recordarme" + "olvidé contraseña" */
         .form-extras {
             display: flex;
             justify-content: space-between;
@@ -317,12 +314,7 @@
             z-index: 0;
         }
 
-        /*
-           OVERLAY DEGRADADO — La clave del contraste sin blur.
-           Va de azul marino oscuro (abajo-izq donde está el texto)
-           a un azul más translúcido arriba-derecha.
-           Esto garantiza WCAG AA para texto blanco.
-        */
+
         .auth-image-panel::after {
             content: '';
             position: absolute;

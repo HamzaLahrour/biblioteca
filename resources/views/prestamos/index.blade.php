@@ -155,7 +155,6 @@
                                 @endif
                             </td>
 
-                            {{-- ACCIONES (Desplegable 2026) --}}
                             <td class="py-3 text-end border-bottom-subtle">
                                 <div class="dropdown dropstart">
                                     <button
@@ -218,7 +217,6 @@
                 </table>
             </div>
 
-            {{-- PAGINACIÓN TRADUCIDA CON AIRE --}}
             <div class="mt-5 mb-2 d-flex flex-column flex-md-row justify-content-between align-items-center gap-4 custom-pagination">
                 <div class="text-muted small bg-light px-3 py-2 rounded-pill border border-neutral-100 shadow-sm-inner">
                     Mostrando del <span class="fw-bold text-dark">{{ $prestamos->firstItem() ?? 0 }}</span> al <span class="fw-bold text-dark">{{ $prestamos->lastItem() ?? 0 }}</span> de <span class="fw-bold text-primary">{{ $prestamos->total() ?? 0 }}</span> resultados
@@ -230,7 +228,6 @@
             </div>
 
             @else
-            {{-- ESTADO VACÍO --}}
             <div class="text-center py-5 my-4">
                 <div class="rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px; background-color: var(--bg-light);">
                     <i class="bi bi-inbox fs-1" style="color: var(--text-muted); opacity: 0.5;"></i>

@@ -53,7 +53,6 @@
             flex: 1;
         }
 
-        /* 🧭 NAVBAR PREMIUM */
         .navbar-minimal {
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -196,7 +195,6 @@
 
             {{-- Logo --}}
             <a class="navbar-brand d-flex align-items-center" href="{{ route('catalogo.index') }}">
-                {{-- Si el logo tiene texto oscuro, destacará perfecto sobre el blanco --}}
                 <img src="{{ asset('img/logolibrelah.png') }}" alt="Logo LibreLah" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             </a>
 
@@ -291,7 +289,6 @@
 
         </div>
 
-        {{-- Aquí se inyecta el contenido de tus vistas --}}
         @yield('content')
     </main>
 

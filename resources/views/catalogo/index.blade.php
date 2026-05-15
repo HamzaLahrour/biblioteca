@@ -538,6 +538,52 @@
             background: var(--primary);
             color: white;
         }
+
+
+        @media (max-width: 768px) {
+            #filtrosAvanzados {
+                /* Redimensionamos para que ocupe el ancho pero no todo el alto */
+                width: 100% !important;
+                max-width: 100% !important;
+                height: 80vh !important;
+                /* Ocupa solo el 80% de la pantalla */
+
+                /* Lo anclamos abajo en vez de a la derecha */
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+
+                /* Le damos el toque de app con los bordes redondeados arriba */
+                border-top-left-radius: 24px !important;
+                border-top-right-radius: 24px !important;
+
+                /* Modificamos la animación de Bootstrap para que suba en vez de venir de lado */
+                transform: translateY(100%) !important;
+            }
+
+            #filtrosAvanzados.show {
+                transform: translateY(0) !important;
+            }
+
+            /* Pequeña píldora gris arriba para indicar que se puede deslizar/cerrar */
+            #filtrosAvanzados .offcanvas-header::before {
+                content: '';
+                position: absolute;
+                top: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40px;
+                height: 5px;
+                background-color: #E0E0E0;
+                border-radius: 10px;
+            }
+
+            /* Empujamos un poco el header para hacerle hueco a la píldora */
+            #filtrosAvanzados .offcanvas-header {
+                padding-top: 1.5rem !important;
+            }
+        }
     </style>
 
     <script>

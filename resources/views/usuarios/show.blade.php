@@ -131,7 +131,6 @@
                                 <tbody>
                                     @forelse($usuario->prestamos as $prestamo)
                                     <tr>
-                                        <!-- Adapta $prestamo->libro->titulo según tu base de datos -->
                                         <td class="fw-medium">{{ $prestamo->libro->titulo ?? 'Recurso desconocido' }}</td>
                                         <td>{{ \Carbon\Carbon::parse($prestamo->fecha_prestamo)->format('d/m/Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($prestamo->fecha_devolucion)->format('d/m/Y') }}</td>
@@ -177,7 +176,6 @@
                                 <tbody>
                                     @forelse($usuario->reservas as $reserva)
                                     <tr>
-                                        <!-- Adapta los campos de reserva según tu DB -->
                                         <td class="fw-medium">{{ $reserva->espacio->nombre ?? 'Espacio' }}</td>
                                         <td>{{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($reserva->hora_inicio)->format('H:i') }}</td>

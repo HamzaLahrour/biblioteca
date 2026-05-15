@@ -15,7 +15,6 @@
 
     <div class="card-body p-4 pt-3">
 
-        {{-- 🔍 BARRA DE FILTROS TÁCTICOS --}}
         <div class="bg-light p-3 rounded-4 mb-4 border">
             <form action="{{ route('espacios.index') }}" method="GET" class="row g-2 align-items-center">
 
@@ -136,7 +135,6 @@
         </div>
 
         @else
-        {{-- ESTADO VACÍO (Con o sin filtros) --}}
         <div class="text-center py-5 text-muted bg-light rounded-4 border border-dashed my-3">
             <i class="bi bi-inbox fs-1 d-block mb-3 text-secondary opacity-50"></i>
             <h5 class="fw-bold text-dark">No se encontraron espacios</h5>

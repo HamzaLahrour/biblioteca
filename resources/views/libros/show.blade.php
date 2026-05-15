@@ -13,16 +13,13 @@
             </a>
         </div>
 
-        {{-- ========================================== --}}
-        {{-- FICHA DEL LIBRO --}}
-        {{-- ========================================== --}}
+
         <div class="card shadow-sm border-0 rounded-4 mb-4 card-blue">
             <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h4 class="fw-bold mb-0 titulo-seccion">
                     <i class="bi bi-book-half me-2"></i>Ficha Literaria
                 </h4>
 
-                {{-- Reemplazamos el UUID por la categoría, que es info útil para el admin --}}
                 <span class="badge categoria-pill rounded-pill px-3 py-2 fw-medium">
                     <i class="bi bi-bookmark-fill me-1"></i>
                     {{ $libro->categoria->nombre ?? 'Sin Categoría' }}
@@ -112,9 +109,7 @@
         </div>
     </div>
 
-    {{-- ========================================== --}}
-    {{-- ACTIVIDAD DEL EJEMPLAR --}}
-    {{-- ========================================== --}}
+
     <div class="card shadow-sm border-0 rounded-4 card-blue">
         <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
             <h5 class="mb-0 fw-bold titulo-seccion">
@@ -258,9 +253,7 @@
         </div>
     </div>
 
-    {{-- ========================================== --}}
-    {{-- OPINIONES (MODERACIÓN — SOLO ADMIN) --}}
-    {{-- ========================================== --}}
+
     <div class="card shadow-sm border-0 rounded-4 mt-4 mb-5 card-blue">
         <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 class="mb-0 fw-bold titulo-seccion">
@@ -273,7 +266,7 @@
 
         <div class="card-body p-4 pt-2">
 
-            {{-- Aviso al admin: solo modera, no comenta --}}
+            {{-- el admin solo modera, no comenta --}}
             <div class="aviso-moderacion mb-4">
                 <i class="bi bi-shield-lock-fill me-2"></i>
                 <span>
@@ -339,9 +332,7 @@
 </div>
 </div>
 
-{{-- ============================================================ --}}
-{{-- ESTILOS — Paleta azul consistente para vista admin --}}
-{{-- ============================================================ --}}
+
 <style>
     .libro-show-admin {
         --primary-blue: #38BDF8;

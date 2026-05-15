@@ -17,7 +17,6 @@
                 Revisa los datos y confirma tu reserva antes de que alguien te quite el puesto.
             </p>
 
-            {{-- Tarjeta de Confirmación Flotante --}}
             <div class="card booking-card border-0 text-start mb-4">
                 <div class="card-body p-4 p-md-5">
 
@@ -29,7 +28,6 @@
                         <i class="bi bi-pin-map-fill me-2" style="color: var(--primary);"></i>{{ $espacio->nombre }}
                     </h4>
 
-                    {{-- Fecha con Icon Box Premium --}}
                     <div class="d-flex align-items-center mb-4">
                         <div class="icon-box me-3">
                             <i class="bi bi-calendar3"></i>
@@ -39,7 +37,6 @@
                         </span>
                     </div>
 
-                    {{-- Hora con Icon Box Premium --}}
                     <div class="d-flex align-items-center">
                         <div class="icon-box me-3">
                             <i class="bi bi-clock-fill"></i>
@@ -59,7 +56,6 @@
                 <input type="hidden" name="hora_inicio" value="{{ $hora_inicio }}">
                 <input type="hidden" name="hora_fin" value="{{ $hora_fin }}">
 
-                {{-- flex-column-reverse pone "Confirmar" arriba en móvil. flex-sm-row los pone lado a lado en PC --}}
                 <div class="d-flex flex-column-reverse flex-sm-row justify-content-center align-items-center gap-2 gap-sm-3 mt-4">
                     <a href="{{ route('reservas_usuario.create', $tipo->id ?? 1) }}" class="btn btn-ghost-cancel rounded-pill fw-medium px-4 py-2">
                         Cambiar hora
@@ -75,7 +71,6 @@
 </div>
 
 <style>
-    /* VARIABLES LOCALES (Nuestro ADN) */
     :root {
         --primary: #1E90FF;
         --secondary-dark: #0D47A1;
@@ -92,7 +87,6 @@
         color: var(--text-main);
     }
 
-    /* TEXTO DEGRADADO */
     .text-gradient {
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary-light) 100%);
         -webkit-background-clip: text;
@@ -101,7 +95,6 @@
         font-weight: 800;
     }
 
-    /* ICONO DE ÉXITO */
     .success-icon-wrapper {
         width: 80px;
         height: 80px;
@@ -131,7 +124,6 @@
         }
     }
 
-    /* TARJETA DE CONFIRMACIÓN */
     .booking-card {
         border-radius: 24px;
         background: #fff;
@@ -143,7 +135,6 @@
         border-bottom: 2px dashed rgba(0, 0, 0, 0.06);
     }
 
-    /* ICON BOXES */
     .icon-box {
         width: 46px;
         height: 46px;
@@ -156,7 +147,6 @@
         font-size: 1.25rem;
     }
 
-    /* BOTONES SUTILES (Definidos) */
     .btn-action {
         background-color: var(--primary);
         border: none;
@@ -168,11 +158,9 @@
     .btn-action:hover {
         background-color: var(--secondary-dark);
         transform: translateY(-1px);
-        /* Elevación más corta */
         box-shadow: 0 6px 15px rgba(13, 71, 161, 0.25);
     }
 
-    /* Botón fantasma (Ghost Button) para la acción secundaria */
     .btn-ghost-cancel {
         color: var(--text-muted);
         background-color: transparent;
@@ -185,7 +173,6 @@
         color: var(--text-main);
     }
 
-    /* Utilidad para anchos en responsive */
     @media (min-width: 576px) {
         .w-sm-auto {
             width: auto !important;
